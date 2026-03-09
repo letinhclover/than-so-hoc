@@ -4,672 +4,991 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <meta name="theme-color" content="#0a0a1a"/>
-<meta name="description" content="Khám phá bí mật ẩn sau những con số - Thần Số Học Pythagoras cho người Việt"/>
+<meta name="description" content="Thần Số Học • Lịch Vạn Sự • Phong Thủy — Ứng dụng tâm linh toàn diện cho người Việt"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Thần Số"/>
-<meta property="og:title" content="Thần Số Học - Vạn Vật Hữu Số"/>
-<meta property="og:description" content="Phân tích số chủ đạo, tên, hợp số đôi, số điện thoại may mắn và nhiều hơn nữa"/>
-<meta property="og:type" content="website"/>
-<title>🔮 Thần Số Học — Vạn Vật Hữu Số</title>
+<meta name="apple-mobile-web-app-title" content="Vạn Sự"/>
+<title>🔮 Vạn Sự — Thần Số • Lịch • Phong Thủy</title>
 <link rel="manifest" href="manifest.json"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:#0a0a1a;overflow:hidden}
-#root{height:100vh;overflow:hidden}
+#root{height:100%;overflow:hidden}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#D4AF37;border-radius:2px}
-@keyframes twinkle{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes orb{0%{transform:translate(0,0)scale(1)}33%{transform:translate(40px,-30px)scale(1.1)}66%{transform:translate(-20px,-50px)scale(.9)}100%{transform:translate(0,0)scale(1)}}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes twinkle{0%,100%{opacity:.12;transform:scale(1)}50%{opacity:.9;transform:scale(1.4)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes orb{0%{transform:translate(0,0)}33%{transform:translate(35px,-25px)}66%{transform:translate(-15px,-45px)}100%{transform:translate(0,0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
-input,select,textarea{-webkit-appearance:none;appearance:none;border-radius:10px}
-input::placeholder{color:#555}
-button:active{transform:scale(.97)}
+@keyframes glow{0%,100%{box-shadow:0 0 8px rgba(212,175,55,.3)}50%{box-shadow:0 0 20px rgba(212,175,55,.7)}}
+input,select{-webkit-appearance:none;appearance:none}
+input::placeholder{color:#444}
+button:active{opacity:.8}
 </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-
 <script type="text/babel">
-const { useState, useEffect, useRef, useCallback, Fragment } = React;
+const {useState,useEffect,useRef,useMemo}=React;
 
-// ==================== NUMEROLOGY ENGINE ====================
-const PYTH = {
-  a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9,j:1,k:2,l:3,m:4,n:5,o:6,p:7,q:8,r:9,s:1,t:2,u:3,v:4,w:5,x:6,y:7,z:8,
-  à:1,á:1,ả:1,ã:1,ạ:1,ă:1,ắ:1,ặ:1,ằ:1,ẳ:1,ẵ:1,â:1,ấ:1,ầ:1,ẩ:1,ẫ:1,ậ:1,đ:4,
-  è:5,é:5,ẻ:5,ẽ:5,ẹ:5,ê:5,ế:5,ề:5,ể:5,ễ:5,ệ:5,ì:9,í:9,ỉ:9,ĩ:9,ị:9,
-  ò:6,ó:6,ỏ:6,õ:6,ọ:6,ô:6,ố:6,ồ:6,ổ:6,ỗ:6,ộ:6,ơ:6,ớ:6,ờ:6,ở:6,ỡ:6,ợ:6,
-  ù:3,ú:3,ủ:3,ũ:3,ụ:3,ư:3,ứ:3,ừ:3,ử:3,ữ:3,ự:3,ỳ:7,ý:7,ỷ:7,ỹ:7,ỵ:7
+// ═══════════════════════════════════════════
+//  VIETNAMESE LUNAR CALENDAR ENGINE
+// ═══════════════════════════════════════════
+const TZ = 7; // Vietnam UTC+7
+
+function jdFromDate(d,m,y){
+  const a=Math.floor((14-m)/12),yr=y+4800-a,mo=m+12*a-3;
+  let jd=d+Math.floor((153*mo+2)/5)+365*yr+Math.floor(yr/4)-Math.floor(yr/100)+Math.floor(yr/400)-32045;
+  if(jd<2299161) jd=d+Math.floor((153*mo+2)/5)+365*yr+Math.floor(yr/4)-32083;
+  return jd;
+}
+function jdToDate(jd){
+  let a,b,c;
+  if(jd>2299160){a=jd+32044;b=Math.floor((4*a+3)/146097);c=a-Math.floor(146097*b/4);}
+  else{b=0;c=jd+32082;}
+  const d=Math.floor((4*c+3)/1461),e=c-Math.floor(1461*d/4),mo=Math.floor((5*e+2)/153);
+  return[e-Math.floor((153*mo+2)/5)+1,mo+3-12*Math.floor(mo/10),100*b+d-4800+Math.floor(mo/10)];
+}
+function getNewMoonDay(k){
+  const dr=Math.PI/180,T=k/1236.85,T2=T*T,T3=T2*T;
+  let jd=2415020.75933+29.53058868*k+0.0001178*T2-0.000000155*T3;
+  jd+=0.00033*Math.sin((166.56+132.87*T-0.009173*T2)*dr);
+  const M=(359.2242+29.10535608*k-0.0000333*T2-0.00000347*T3)*dr;
+  const Mpr=(306.0253+385.81691806*k+0.0107306*T2+0.00001236*T3)*dr;
+  const F=(21.2964+390.67050646*k-0.0016528*T2-0.00000239*T3)*dr;
+  let C=(0.1734-0.000393*T)*Math.sin(M)+0.0021*Math.sin(2*M);
+  C-=0.4068*Math.sin(Mpr)+0.0161*Math.sin(2*Mpr)-0.0004*Math.sin(3*Mpr);
+  C+=0.0104*Math.sin(2*F)-0.0051*Math.sin(M+Mpr)-0.0074*Math.sin(M-Mpr);
+  C+=0.0004*Math.sin(2*F+M)-0.0004*Math.sin(2*F-M)-0.0006*Math.sin(2*F+Mpr);
+  C+=0.001*Math.sin(2*F-Mpr)+0.0005*Math.sin(M+2*Mpr);
+  const dt=T<-11?0.001+0.000839*T+0.0002261*T2-0.00000845*T3:-0.000278+0.000265*T+0.000262*T2;
+  return Math.floor(jd+C-dt+0.5+TZ/24);
+}
+function getSunLong(jd){
+  const dr=Math.PI/180,T=(jd-2451545)/36525,T2=T*T;
+  let M=357.5291+35999.0503*T-0.0001559*T2,L=280.46646+36000.76983*T+0.0003032*T2;
+  M*=dr;
+  let C=(1.9146-0.004817*T-0.000014*T2)*Math.sin(M)+(0.019993-0.000101*T)*Math.sin(2*M)+0.00029*Math.sin(3*M);
+  L=(L+C)%360;
+  return Math.floor(L/30);
+}
+function getLM11(y){
+  const off=jdFromDate(31,12,y)-2415021;
+  let k=Math.floor(off/29.530588853),nm=getNewMoonDay(k);
+  if(getSunLong(nm)>=9) nm=getNewMoonDay(k-1);
+  return nm;
+}
+function isLeapYear(k){
+  const nm0=getNewMoonDay(k),nm2=getNewMoonDay(k+2);
+  return Math.floor(nm2-nm0)>=60&&getSunLong(getNewMoonDay(k+1))===getSunLong(nm0);
+}
+
+function solarToLunar(d,m,y){
+  const jd=jdFromDate(d,m,y);
+  let k=Math.floor((jd-2415021)/29.530588853);
+  let nm=getNewMoonDay(k);
+  if(nm>jd) nm=getNewMoonDay(k-1);
+  // find month 11
+  let a11=getLM11(y-(m<11&&getSunLong(nm)>=9?1:0));
+  let b11=getLM11(y+(m===11&&getSunLong(nm)<9?1:0));
+  // determine lunar month number
+  let monthStart=nm;
+  let lunarMonth=Math.round((monthStart-a11)/29.530588853)+11;
+  let leapYear=false;
+  // check leap
+  let off=Math.round((a11-getLM11(y-1))/29.530588853);
+  if(off===13){
+    // there's a leap month
+    const leapMo=findLeapMonth(getLM11(y-1),y);
+    if(lunarMonth>=leapMo) lunarMonth--;
+    leapYear=true;
+  }
+  lunarMonth=((lunarMonth-1)%12)+1;
+  if(lunarMonth<=0) lunarMonth+=12;
+  return{day:jd-nm+1,month:lunarMonth,year:y-(lunarMonth>10&&m<4?1:0)+(lunarMonth<4&&m>10?1:0)};
+}
+
+// Simpler reliable approach
+function solar2Lunar(dd,mm,yy){
+  const jd=jdFromDate(dd,mm,yy);
+  let k=Math.floor((jd-2415021.076998695)/29.530588853);
+  let monthStart=getNewMoonDay(k);
+  if(monthStart>jd) monthStart=getNewMoonDay(k-1);
+  const lunarDay=jd-monthStart+1;
+  // Find lunar year's month 11
+  let a11=getLM11(yy), b11=getLM11(yy+1);
+  if(a11>jd) a11=getLM11(yy-1), b11=getLM11(yy);
+  const lunarYear=a11<2299161?yy:yy;
+  let lunarMonth=Math.round((monthStart-a11)/29.530588853)+11;
+  if(b11-a11>365){
+    const leapStart=getLM11(yy-1);
+    let lm=Math.round((a11-leapStart)/29.530588853)+11;
+    if(lm===0) lm=11;
+  }
+  lunarMonth=((lunarMonth-1)%12)+1;
+  let lunarYr=yy;
+  if(mm<4&&lunarMonth>9) lunarYr=yy-1;
+  if(mm>9&&lunarMonth<4) lunarYr=yy+1;
+  return{d:lunarDay,m:lunarMonth,y:lunarYr};
+}
+function findLeapMonth(a11,y){return 0;}
+
+// ═══════════════════════════════════════════
+//  CAN CHI ENGINE
+// ═══════════════════════════════════════════
+const CAN=['Giáp','Ất','Bính','Đinh','Mậu','Kỷ','Canh','Tân','Nhâm','Quý'];
+const CHI=['Tý','Sửu','Dần','Mão','Thìn','Tỵ','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi'];
+const GIAP=['Giáp Tý','Ất Sửu','Bính Dần','Đinh Mão','Mậu Thìn','Kỷ Tỵ','Canh Ngọ','Tân Mùi','Nhâm Thân','Quý Dậu','Giáp Tuất','Ất Hợi','Bính Tý','Đinh Sửu','Mậu Dần','Kỷ Mão','Canh Thìn','Tân Tỵ','Nhâm Ngọ','Quý Mùi','Giáp Thân','Ất Dậu','Bính Tuất','Đinh Hợi','Mậu Tý','Kỷ Sửu','Canh Dần','Tân Mão','Nhâm Thìn','Quý Tỵ','Giáp Ngọ','Ất Mùi','Bính Thân','Đinh Dậu','Mậu Tuất','Kỷ Hợi','Canh Tý','Tân Sửu','Nhâm Dần','Quý Mão','Giáp Thìn','Ất Tỵ','Bính Ngọ','Đinh Mùi','Mậu Thân','Kỷ Dậu','Canh Tuất','Tân Hợi','Nhâm Tý','Quý Sửu','Giáp Dần','Ất Mão','Bính Thìn','Đinh Tỵ','Mậu Ngọ','Kỷ Mùi','Canh Thân','Tân Dậu','Nhâm Tuất','Quý Hợi'];
+
+const getYearCan=(y)=>CAN[(y+6)%10];
+const getYearChi=(y)=>CHI[(y+8)%12];
+const getYearCC=(y)=>`${getYearCan(y)} ${getYearChi(y)}`;
+const getDayCCIdx=(jd)=>((jd+9)%60+60)%60;
+const getDayCC=(jd)=>GIAP[getDayCCIdx(jd)];
+const getDayCanIdx=(jd)=>getDayCCIdx(jd)%10;
+const getDayChiIdx=(jd)=>getDayCCIdx(jd)%12;
+
+// Tháng can chi
+const getMonthCC=(lunarMonth,yearCan)=>{
+  const canBase=[2,4,6,8,0,2,4,6,8,0,2,4]; // based on year can
+  const offset=[0,2,4,6,8,0][Math.floor(CAN.indexOf(yearCan)/2)%6];
+  const canIdx=(lunarMonth-1+offset)%10;
+  return`${CAN[canIdx]} ${CHI[(lunarMonth+0)%12]}`;
 };
-const VOWELS = new Set('aeiouàáảãạăắặằẳẵâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ');
-const MASTER = new Set([11,22,33]);
 
-const reduce = n => {
-  if(MASTER.has(n)||n<=0) return n||0;
-  if(n<=9) return n;
-  return reduce([...String(n)].reduce((a,b)=>a+parseInt(b),0));
+// ═══════════════════════════════════════════
+//  SAO (12 STARS) - NGÀY TỐT XẤU
+// ═══════════════════════════════════════════
+const SAO=[
+  {n:'Kiến',t:true,m:'Thành lập, xây dựng, khởi sự việc mới'},
+  {n:'Trừ',t:true,m:'Trừ bỏ xấu, chữa bệnh, dọn dẹp'},
+  {n:'Mãn',t:true,m:'Đầy đủ, sung mãn — tốt cho kết hôn, khai trương'},
+  {n:'Bình',t:true,m:'Bình ổn — tốt cho đi lại, hội họp'},
+  {n:'Định',t:true,m:'Ổn định — tốt cho ký kết, định cư'},
+  {n:'Chấp',t:false,m:'Hạn chế — tránh khởi sự việc lớn'},
+  {n:'Phá',t:false,m:'Phá hoại — tránh mọi việc quan trọng'},
+  {n:'Nguy',t:false,m:'Nguy hiểm — cẩn thận tai nạn, không xuất hành'},
+  {n:'Thành',t:true,m:'Thành tựu — rất tốt cho mọi việc'},
+  {n:'Thu',t:false,m:'Thu rút — không nên khởi sự'},
+  {n:'Khai',t:true,m:'Khai mở — tốt cho khai trương, học hành'},
+  {n:'Bế',t:false,m:'Bế tắc — không nên làm việc quan trọng'},
+];
+// Sao dựa theo tháng âm và ngày can chi
+const getSao=(lunarDay,lunarMonth)=>{
+  const base=[0,1,2,3,4,5,6,7,8,9,10,11]; // tháng 1
+  const offset=[0,2,4,6,8,10,0,2,4,6,8,10];
+  const idx=((lunarDay-1)+offset[(lunarMonth-1)%12])%12;
+  return SAO[idx];
 };
-const sumStr = s => [...s].reduce((a,b)=>a+(parseInt(b)||0),0);
-const getLP = dob => { const d=dob.replace(/\D/g,''); return d.length>=8?reduce(sumStr(d)):null; };
-const getExp = name => { const c=name.toLowerCase().replace(/\s/g,''); return reduce([...c].reduce((a,ch)=>a+(PYTH[ch]||0),0)); };
-const getSoul = name => { const c=name.toLowerCase().replace(/\s/g,''); return reduce([...c].filter(ch=>VOWELS.has(ch)).reduce((a,ch)=>a+(PYTH[ch]||0),0)); };
-const getPerso = name => { const c=name.toLowerCase().replace(/\s/g,''); return reduce([...c].filter(ch=>!VOWELS.has(ch)&&PYTH[ch]).reduce((a,ch)=>a+(PYTH[ch]||0),0)); };
-const getAtt = dob => { const d=dob.replace(/\D/g,''); return d.length>=4?reduce(sumStr(d.slice(0,4))):null; };
-const getPY = (dob,yr) => { const d=dob.replace(/\D/g,''); return d.length>=4?reduce(sumStr(d.slice(0,4)+String(yr))):null; };
-const analyzeNum = s => reduce(sumStr(s.replace(/\D/g,'')));
 
-const compat = (a,b) => {
-  const C = {1:[1,3,5],2:[2,4,8],3:[1,3,5],4:[2,4,6],5:[1,3,5],6:[2,4,6],7:[2,7],8:[2,4,8],9:[3,6,9],11:[2,11],22:[4,22],33:[6,33]};
-  const list = C[a]||[];
-  if(list.includes(b)) return 85+Math.floor(Math.random()*15);
-  const diff = Math.abs((a>10?a/11:a)-(b>10?b/11:b));
-  return Math.max(42, 78-Math.round(diff*8));
+// Hoàng đạo / Hắc đạo giờ (12 giờ trong ngày)
+const GIO_HD=[
+  {g:'Tý (23-1h)',hd:[0,1,2,3,4,5]}, // giờ tốt dựa theo ngày can
+];
+const HD_HOURS=[
+  ['Tý','Sửu','Mão','Thìn','Ngọ','Mùi'],  // ngày Giáp,Kỷ
+  ['Tý','Dần','Mão','Tỵ','Ngọ','Thân'],    // ngày Ất,Canh
+  ['Sửu','Dần','Thìn','Tỵ','Mùi','Thân'],  // ngày Bính,Tân
+  ['Sửu','Mão','Thìn','Ngọ','Mùi','Dậu'],  // ngày Đinh,Nhâm
+  ['Dần','Mão','Tỵ','Ngọ','Thân','Dậu'],   // ngày Mậu,Quý
+];
+const GIO_LIST=['Tý','Sửu','Dần','Mão','Thìn','Tỵ','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi'];
+const GIO_TIME=['23-1h','1-3h','3-5h','5-7h','7-9h','9-11h','11-13h','13-15h','15-17h','17-19h','19-21h','21-23h'];
+
+function getHDGio(dayCanIdx){
+  const row=Math.floor(dayCanIdx/2)%5;
+  return HD_HOURS[row];
+}
+
+// ═══════════════════════════════════════════
+//  12 CON GIÁP
+// ═══════════════════════════════════════════
+const GIAP12=[
+  {n:'Chuột',e:'🐭',y:[1924,1936,1948,1960,1972,1984,1996,2008,2020],hh:'Trâu,Rồng,Khỉ',kh:'Ngựa,Mèo',desc:'Thông minh, lanh lợi, nhạy bén trong kinh doanh. Hay lo xa nhưng thích nghi tốt.',el:'Thủy',color:'#4ECDC4'},
+  {n:'Trâu',e:'🐮',y:[1925,1937,1949,1961,1973,1985,1997,2009,2021],hh:'Chuột,Rắn,Gà',kh:'Dê,Ngựa,Chó',desc:'Cần cù, kiên nhẫn, đáng tin cậy. Chậm mà chắc, thích sự ổn định.',el:'Thổ',color:'#6BCB77'},
+  {n:'Hổ',e:'🐯',y:[1926,1938,1950,1962,1974,1986,1998,2010,2022],hh:'Ngựa,Chó',kh:'Khỉ,Rắn',desc:'Dũng cảm, mạnh mẽ, có sức lôi cuốn. Sinh ra để lãnh đạo.',el:'Mộc',color:'#FF6B6B'},
+  {n:'Mèo',e:'🐱',y:[1927,1939,1951,1963,1975,1987,1999,2011,2023],hh:'Dê,Heo,Chó',kh:'Gà,Chuột',desc:'Tài hoa, nhạy cảm, khéo léo. Thích nghệ thuật và cuộc sống thoải mái.',el:'Mộc',color:'#FFE66D'},
+  {n:'Rồng',e:'🐲',y:[1928,1940,1952,1964,1976,1988,2000,2012,2024],hh:'Chuột,Khỉ,Gà',kh:'Chó,Trâu',desc:'Uy nghi, tài năng, đầy năng lượng. Mệnh cao quý nhất trong 12 con giáp.',el:'Thổ',color:'#D4AF37'},
+  {n:'Rắn',e:'🐍',y:[1929,1941,1953,1965,1977,1989,2001,2013,2025],hh:'Trâu,Gà',kh:'Heo,Hổ',desc:'Khôn ngoan, bí ẩn, trực giác nhạy. Suy nghĩ sâu sắc trước khi hành động.',el:'Hỏa',color:'#A29BFE'},
+  {n:'Ngựa',e:'🐴',y:[1930,1942,1954,1966,1978,1990,2002,2014,2026],hh:'Hổ,Dê,Chó',kh:'Chuột,Trâu',desc:'Tự do, nhiệt tình, hoạt bát. Yêu độc lập và ghét bị ràng buộc.',el:'Hỏa',color:'#FDCB6E'},
+  {n:'Dê',e:'🐑',y:[1931,1943,1955,1967,1979,1991,2003,2015,2027],hh:'Mèo,Ngựa,Heo',kh:'Trâu,Chó',desc:'Ôn hòa, sáng tạo, tốt bụng. Có khiếu nghệ thuật và tâm hồn nhạy cảm.',el:'Thổ',color:'#FF9FF3'},
+  {n:'Khỉ',e:'🐵',y:[1932,1944,1956,1968,1980,1992,2004,2016,2028],hh:'Chuột,Rồng',kh:'Hổ,Heo',desc:'Thông minh, linh hoạt, tài ba. Học mọi thứ rất nhanh.',el:'Kim',color:'#4D96FF'},
+  {n:'Gà',e:'🐔',y:[1933,1945,1957,1969,1981,1993,2005,2017,2029],hh:'Trâu,Rồng,Rắn',kh:'Mèo,Chuột',desc:'Tự tin, cẩn thận, chi tiết. Luôn muốn hoàn hảo trong mọi việc.',el:'Kim',color:'#E17055'},
+  {n:'Chó',e:'🐶',y:[1934,1946,1958,1970,1982,1994,2006,2018,2030],hh:'Hổ,Ngựa,Mèo',kh:'Rồng,Dê,Trâu',desc:'Trung thành, chân thành, dũng cảm. Người bạn và đồng minh tốt nhất.',el:'Thổ',color:'#B2BEC3'},
+  {n:'Heo',e:'🐷',y:[1935,1947,1959,1971,1983,1995,2007,2019,2031],hh:'Mèo,Dê',kh:'Rắn,Khỉ',desc:'Hào phóng, tốt bụng, chân thật. Yêu thương gia đình và bạn bè vô điều kiện.',el:'Thủy',color:'#FD79A8'},
+];
+
+function getGiap12FromYear(y){
+  const idx=((y-4)%12+12)%12;
+  return GIAP12[idx];
+}
+
+const COMPAT_12=[
+  // Chuột,Trâu,Hổ,Mèo,Rồng,Rắn,Ngựa,Dê,Khỉ,Gà,Chó,Heo
+  [80,70,50,55,90,60,30,45,90,65,55,70], // Chuột
+  [70,75,45,50,55,95,35,25,60,90,30,60], // Trâu
+  [50,45,70,60,65,35,90,65,30,55,90,55], // Hổ
+  [55,50,60,80,55,45,60,90,45,25,85,90], // Mèo
+  [90,55,65,55,70,75,55,40,90,90,30,55], // Rồng
+  [60,95,35,45,75,75,45,50,60,90,45,25], // Rắn
+  [30,35,90,60,55,45,80,85,55,50,90,60], // Ngựa
+  [45,25,65,90,40,50,85,70,55,60,30,90], // Dê
+  [90,60,30,45,90,60,55,55,75,55,55,30], // Khỉ
+  [65,90,55,25,90,90,50,60,55,80,55,45], // Gà
+  [55,30,90,85,30,45,90,30,55,55,70,80], // Chó
+  [70,60,55,90,55,25,60,90,30,45,80,75], // Heo
+];
+
+function zodiacCompat(y1,y2){
+  const i1=((y1-4)%12+12)%12;
+  const i2=((y2-4)%12+12)%12;
+  return COMPAT_12[i1][i2];
+}
+
+// ═══════════════════════════════════════════
+//  PHONG THỦY
+// ═══════════════════════════════════════════
+const CUNG_PHI=[
+  {c:'Khảm',e:'💧',hu:'Bắc',el:'Thủy',mau:'Xanh đen',so:'1',tt:'Thông minh, học giỏi, sự nghiệp thăng tiến'},
+  {c:'Khôn',e:'🌍',hu:'Tây Nam',el:'Thổ',mau:'Vàng',so:'2',tt:'Gia đình hòa thuận, mẹ hiền, tình cảm ấm áp'},
+  {c:'Chấn',e:'⚡',hu:'Đông',el:'Mộc',mau:'Xanh lá',so:'3',tt:'Trưởng nam, sự phát triển, tinh thần mạnh mẽ'},
+  {c:'Tốn',e:'🌬️',hu:'Đông Nam',el:'Mộc',mau:'Xanh lá nhạt',so:'4',tt:'Tài lộc, may mắn, khéo léo trong kinh doanh'},
+  {c:'Trung Cung',e:'⭕',hu:'Trung tâm',el:'Thổ',mau:'Vàng',so:'5',tt:'Trung tâm năng lượng — cân bằng mọi phương'},
+  {c:'Càn',e:'☰',hu:'Tây Bắc',el:'Kim',mau:'Trắng',so:'6',tt:'Người cha, quyền lực, sự bảo vệ và uy nghiêm'},
+  {c:'Đoài',e:'🎯',hu:'Tây',el:'Kim',mau:'Trắng',so:'7',tt:'Vui vẻ, giao tiếp tốt, con gái út'},
+  {c:'Cấn',e:'🏔️',hu:'Đông Bắc',el:'Thổ',mau:'Vàng đất',so:'8',tt:'Con trai út, tích lũy của cải, bền vững'},
+  {c:'Ly',e:'🔥',hu:'Nam',el:'Hỏa',mau:'Đỏ',so:'9',tt:'Danh tiếng, trí tuệ, vẻ đẹp và sự nổi bật'},
+];
+
+function getCungPhi(y){
+  // Cung phi năm sinh
+  const n=((y%9)+9)%9;
+  if(n===0) return CUNG_PHI[8]; // số 9
+  return CUNG_PHI[n-1];
+}
+
+const NGU_HANH={
+  'Kim':['Thủy','Kim'],kh_Kim:['Hỏa','Mộc'],
+  'Mộc':['Hỏa','Mộc'],kh_Mộc:['Kim','Thổ'],
+  'Thủy':['Mộc','Thủy'],kh_Thủy:['Thổ','Hỏa'],
+  'Hỏa':['Thổ','Hỏa'],kh_Hỏa:['Thủy','Kim'],
+  'Thổ':['Kim','Thổ'],kh_Thổ:['Mộc','Thủy'],
 };
 
-// ==================== DATA ====================
-const N = {
-  1:{e:"👑",c:"#FF6B6B",n:"Người Lãnh Đạo",s:"Độc lập • Tiên phong • Quyết đoán",d:"Bạn sinh ra để dẫn đường. Ý chí sắt đá và tư duy đột phá là vũ khí của bạn. Bạn không theo đám đông — bạn tạo ra con đường riêng.",st:["Lãnh đạo bẩm sinh","Sáng tạo đột phá","Ý chí phi thường","Quyết đoán"],wk:["Đôi khi cứng đầu","Khó nhận giúp đỡ","Có thể ích kỷ"],ca:["Doanh nhân","CEO","Chính khách","Nhà phát minh"],cl:["🔴 Đỏ","🟡 Vàng","🟠 Cam"],dy:["Chủ Nhật","Thứ Hai"]},
-  2:{e:"🤝",c:"#4ECDC4",n:"Người Hòa Giải",s:"Nhạy cảm • Hợp tác • Ngoại giao",d:"Bạn là cầu nối giữa mọi người. Trực giác nhạy bén và khả năng đồng cảm sâu sắc là món quà đặc biệt của bạn.",st:["Ngoại giao tinh tế","Kiên nhẫn vô tận","Trực giác sắc bén","Chung thủy"],wk:["Thiếu quyết đoán","Quá nhạy cảm","Phụ thuộc người khác"],ca:["Cố vấn","Nhà trị liệu","Giáo viên","Nhà ngoại giao"],cl:["🔵 Xanh ngọc","🟠 Cam","⬜ Kem"],dy:["Thứ Hai","Thứ Sáu"]},
-  3:{e:"🎨",c:"#FFE66D",n:"Người Sáng Tạo",s:"Vui vẻ • Nghệ thuật • Truyền cảm hứng",d:"Bạn là nghệ sĩ của cuộc đời. Năng lượng tràn đầy, lời nói cuốn hút và óc sáng tạo là tài sản vô giá của bạn.",st:["Sáng tạo phong phú","Giao tiếp xuất sắc","Lạc quan lan tỏa","Hài hước"],wk:["Hay mất tập trung","Thiếu kiên nhẫn","Khó hoàn thành"],ca:["Nghệ sĩ","Nhà văn","Diễn viên","Marketing"],cl:["🟡 Vàng","🩷 Hồng","🟠 Cam"],dy:["Thứ Tư","Thứ Sáu"]},
-  4:{e:"🏗️",c:"#6BCB77",n:"Người Xây Dựng",s:"Ổn định • Kỷ luật • Bền bỉ",d:"Bạn là nền tảng vững chắc của mọi thứ. Kỷ luật và sự kiên trì xây nên những thành tựu bền vững mà người khác ngưỡng mộ.",st:["Kỷ luật tuyệt vời","Đáng tin cậy","Tổ chức khoa học","Bền bỉ"],wk:["Đôi khi cứng nhắc","Ngại thay đổi","Có thể nhàm chán"],ca:["Kỹ sư","Kiến trúc sư","Kế toán","Quản lý dự án"],cl:["🟢 Xanh lá","🟤 Nâu","🔵 Xanh dương"],dy:["Thứ Tư","Thứ Bảy"]},
-  5:{e:"🌊",c:"#4D96FF",n:"Người Tự Do",s:"Phiêu lưu • Linh hoạt • Đổi mới",d:"Bạn là tinh thần tự do không thể giam cầm. Cuộc sống là một chuyến phiêu lưu bất tận và bạn luôn sẵn sàng cho điều tiếp theo.",st:["Thích nghi siêu nhanh","Dũng cảm phiêu lưu","Linh hoạt","Cuốn hút"],wk:["Thiếu kiên nhẫn","Không ổn định","Dễ chán"],ca:["Du lịch","Báo chí","Sales","Khởi nghiệp"],cl:["🔵 Xanh dương","⚪ Bạc","🩵 Turquoise"],dy:["Thứ Tư","Thứ Sáu","Chủ Nhật"]},
-  6:{e:"💝",c:"#FF9FF3",n:"Người Nuôi Dưỡng",s:"Yêu thương • Gia đình • Trách nhiệm",d:"Bạn là trái tim của mọi người xung quanh. Tình yêu vô điều kiện và tinh thần phục vụ là sứ mệnh thiêng liêng của bạn.",st:["Yêu thương chân thành","Có trách nhiệm","Chăm sóc tận tâm","Đáng tin"],wk:["Hay lo lắng","Quá bảo bọc","Khó buông tay"],ca:["Bác sĩ","Y tá","Giáo viên","Nội thất"],cl:["🩷 Hồng","💚 Ngọc bích","⬜ Trắng"],dy:["Thứ Hai","Thứ Sáu"]},
-  7:{e:"🔮",c:"#A29BFE",n:"Người Tìm Kiếm",s:"Trí tuệ • Tâm linh • Phân tích",d:"Bạn là nhà hiền triết của vũ trụ. Luôn đi sâu vào bản chất mọi thứ, trí tuệ và tâm linh là đôi cánh dẫn đường bạn.",st:["Trí tuệ sắc bén","Trực giác phi thường","Phân tích sâu","Tâm linh"],wk:["Khép kín","Khó tin người","Hay cô đơn"],ca:["Nghiên cứu","Lập trình","Phân tích","Tâm lý học"],cl:["🟣 Tím","🔵 Xanh đậm","⚪ Bạc"],dy:["Thứ Hai","Thứ Bảy"]},
-  8:{e:"💎",c:"#FDCB6E",n:"Người Quyền Lực",s:"Tham vọng • Thành công • Thịnh vượng",d:"Bạn được sinh ra để thành công vĩ đại. Hiểu cách biến tầm nhìn thành tiền bạc là năng khiếu đặc biệt của số 8.",st:["Tham vọng mạnh mẽ","Kinh doanh nhạy bén","Quyết tâm cao","Lãnh đạo"],wk:["Quá coi trọng vật chất","Workaholic","Đôi khi ích kỷ"],ca:["Doanh nhân","Tài chính","Đầu tư","Bất động sản"],cl:["🖤 Đen","🟡 Vàng","🔵 Xanh đậm"],dy:["Thứ Bảy","Chủ Nhật"]},
-  9:{e:"🌍",c:"#E17055",n:"Người Nhân Ái",s:"Nhân đạo • Trí tuệ • Hoàn thiện",d:"Bạn là linh hồn của nhân loại. Trái tim vị tha, tầm nhìn rộng lớn và trí tuệ tổng hợp — bạn sống để cho đi.",st:["Tâm hồn rộng lớn","Sáng tạo cao","Trí tuệ tổng hợp","Từ bi"],wk:["Quá lý tưởng","Khó chấp nhận thực tế","Dễ bị lợi dụng"],ca:["Từ thiện","Nghệ thuật","Giáo dục","Y tế"],cl:["🟡 Vàng","🔴 Đỏ","🟠 Cam"],dy:["Thứ Ba","Thứ Năm"]},
-  11:{e:"✨",c:"#C7CEEA",n:"Nhà Tiên Tri",s:"Trực giác cao • Tâm linh • Cảm hứng",d:"Số Master đặc biệt. Khả năng cảm nhận siêu việt, kết nối với tần số cao hơn — bạn sinh ra để soi sáng đường cho người khác.",st:["Trực giác phi thường","Tâm linh sâu sắc","Truyền cảm hứng","Sáng tạo"],wk:["Hay lo âu","Cảm xúc bất ổn","Áp lực lớn"],ca:["Tâm linh","Nghệ sĩ","Tư vấn","Giáo dục"],cl:["⚪ Bạc","⬜ Trắng","🟣 Tím nhạt"],dy:["Thứ Hai"]},
-  22:{e:"🌐",c:"#B2BEC3",n:"Kiến Trúc Sư Vĩ Đại",s:"Xây dựng vĩ đại • Thực tế • Toàn cầu",d:"Số Master quyền năng nhất. Biến những ước mơ vĩ đại thành hiện thực với tầm nhìn toàn cầu.",st:["Tầm nhìn vĩ đại","Năng lực thực tế","Lãnh đạo toàn cầu"],wk:["Áp lực khổng lồ","Hay nghi ngờ bản thân"],ca:["Chính khách","Kiến trúc sư","Lãnh đạo"],cl:["🔴 Đỏ sẫm","🟡 Vàng","🔵 Hải quân"],dy:["Thứ Tư","Thứ Bảy"]},
-  33:{e:"🕊️",c:"#FFEAA7",n:"Bậc Thầy Tình Yêu",s:"Thiêng liêng • Từ bi • Hy sinh",d:"Số Master thiêng liêng nhất. Được gọi đến sứ mệnh phục vụ nhân loại với tình yêu vô điều kiện.",st:["Tình yêu bao la","Hy sinh cao cả","Truyền cảm hứng"],wk:["Tự bỏ bê bản thân","Gánh quá nhiều"],ca:["Tôn giáo","Từ thiện","Giáo dục","Chữa lành"],cl:["⬜ Trắng","🟡 Vàng nhạt","🟢 Xanh lá nhạt"],dy:["Thứ Năm","Chủ Nhật"]}
+const EL_COLOR={'Kim':'#C0C0C0','Mộc':'#6BCB77','Thủy':'#4D96FF','Hỏa':'#FF6B6B','Thổ':'#FDCB6E'};
+const EL_EMOJI={'Kim':'⚙️','Mộc':'🌿','Thủy':'💧','Hỏa':'🔥','Thổ':'🏔️'};
+
+function getCanElement(canIdx){
+  const els=['Mộc','Mộc','Hỏa','Hỏa','Thổ','Thổ','Kim','Kim','Thủy','Thủy'];
+  return els[canIdx];
+}
+
+const HUONG_TUONG_SINH={
+  'Mộc':['Đông','Đông Nam'],
+  'Hỏa':['Nam'],
+  'Thổ':['Trung','Đông Bắc','Tây Nam'],
+  'Kim':['Tây','Tây Bắc'],
+  'Thủy':['Bắc'],
 };
-const YR = {1:"Năm Khởi Đầu — Gieo hạt giống cho 9 năm tới. Dũng cảm bắt đầu!",2:"Năm Kiên Nhẫn — Xây dựng quan hệ, hợp tác. Đừng vội vàng.",3:"Năm Sáng Tạo — Thể hiện bản thân, kết nối xã hội. Vui sống!",4:"Năm Nỗ Lực — Xây nền tảng vững chắc. Kỷ luật là chìa khóa.",5:"Năm Thay Đổi — Cơ hội mới, hành trình mới. Đón nhận biến động!",6:"Năm Gia Đình — Tập trung người thân, sức khỏe, tình yêu.",7:"Năm Nội Tâm — Học hỏi, nghiên cứu, tự khám phá bản thân.",8:"Năm Thu Hoạch — Thành tựu và tiền bạc tìm đến bạn!",9:"Năm Kết Thúc — Buông bỏ, hoàn tất, chuẩn bị chu kỳ mới."};
 
-// ==================== COMPONENTS ====================
+// ═══════════════════════════════════════════
+//  NUMEROLOGY ENGINE (từ v1)
+// ═══════════════════════════════════════════
+const PYTH={a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9,j:1,k:2,l:3,m:4,n:5,o:6,p:7,q:8,r:9,s:1,t:2,u:3,v:4,w:5,x:6,y:7,z:8,à:1,á:1,ả:1,ã:1,ạ:1,ă:1,ắ:1,ặ:1,ằ:1,ẳ:1,ẵ:1,â:1,ấ:1,ầ:1,ẩ:1,ẫ:1,ậ:1,đ:4,è:5,é:5,ẻ:5,ẽ:5,ẹ:5,ê:5,ế:5,ề:5,ể:5,ễ:5,ệ:5,ì:9,í:9,ỉ:9,ĩ:9,ị:9,ò:6,ó:6,ỏ:6,õ:6,ọ:6,ô:6,ố:6,ồ:6,ổ:6,ỗ:6,ộ:6,ơ:6,ớ:6,ờ:6,ở:6,ỡ:6,ợ:6,ù:3,ú:3,ủ:3,ũ:3,ụ:3,ư:3,ứ:3,ừ:3,ử:3,ữ:3,ự:3,ỳ:7,ý:7,ỷ:7,ỹ:7,ỵ:7};
+const VOWELS=new Set('aeiouàáảãạăắặằẳẵâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ');
+const MASTER=new Set([11,22,33]);
+const reduce=n=>{if(MASTER.has(n)||n<=0)return n||0;if(n<=9)return n;return reduce([...String(n)].reduce((a,b)=>a+parseInt(b),0));};
+const sumStr=s=>[...s].reduce((a,b)=>a+(parseInt(b)||0),0);
+const getLP=dob=>{const d=dob.replace(/\D/g,'');return d.length>=8?reduce(sumStr(d)):null;};
+const getExp=name=>{const c=name.toLowerCase().replace(/\s/g,'');return reduce([...c].reduce((a,ch)=>a+(PYTH[ch]||0),0));};
+const getSoul=name=>{const c=name.toLowerCase().replace(/\s/g,'');return reduce([...c].filter(ch=>VOWELS.has(ch)).reduce((a,ch)=>a+(PYTH[ch]||0),0));};
+const getPerso=name=>{const c=name.toLowerCase().replace(/\s/g,'');return reduce([...c].filter(ch=>!VOWELS.has(ch)&&PYTH[ch]).reduce((a,ch)=>a+(PYTH[ch]||0),0));};
+const getAtt=dob=>{const d=dob.replace(/\D/g,'');return d.length>=4?reduce(sumStr(d.slice(0,4))):null;};
+const getPY=(dob,yr)=>{const d=dob.replace(/\D/g,'');return d.length>=4?reduce(sumStr(d.slice(0,4)+String(yr))):null;};
+const analyzeNum=s=>reduce(sumStr(s.replace(/\D/g,'')));
+const numCompat=(a,b)=>{const C={1:[1,3,5],2:[2,4,8],3:[1,3,5],4:[2,4,6],5:[1,3,5],6:[2,4,6],7:[2,7],8:[2,4,8],9:[3,6,9],11:[2,11],22:[4,22],33:[6,33]};return(C[a]||[]).includes(b)?85+Math.floor(Math.random()*12):Math.max(42,78-Math.abs((a>10?a/11:a)-(b>10?b/11:b))*8);};
 
-function Stars() {
-  const stars = Array.from({length:55},()=>({x:Math.random()*100,y:Math.random()*100,s:Math.random()*2+.5,d:Math.random()*4,du:Math.random()*3+2}));
-  return (
+// ═══════════════════════════════════════════
+//  NUMBER DATA
+// ═══════════════════════════════════════════
+const N={1:{e:"👑",c:"#FF6B6B",n:"Người Lãnh Đạo",s:"Độc lập • Tiên phong",d:"Bạn sinh ra để dẫn đường. Ý chí sắt đá và tư duy đột phá là vũ khí của bạn.",st:["Lãnh đạo","Sáng tạo","Quyết đoán"],wk:["Cứng đầu","Khó nhờ giúp"],ca:["Doanh nhân","CEO","Chính khách"],cl:["🔴 Đỏ","🟡 Vàng"],dy:["Chủ Nhật","Thứ Hai"]},2:{e:"🤝",c:"#4ECDC4",n:"Người Hòa Giải",s:"Nhạy cảm • Hợp tác",d:"Trực giác nhạy bén và đồng cảm sâu là món quà đặc biệt của bạn.",st:["Ngoại giao","Kiên nhẫn","Chung thủy"],wk:["Thiếu quyết đoán","Quá nhạy cảm"],ca:["Cố vấn","Giáo viên","Ngoại giao"],cl:["🔵 Ngọc","🟠 Cam"],dy:["Thứ Hai","Thứ Sáu"]},3:{e:"🎨",c:"#FFE66D",n:"Người Sáng Tạo",s:"Vui vẻ • Nghệ thuật",d:"Năng lượng tràn đầy, lời nói cuốn hút và óc sáng tạo là tài sản vô giá.",st:["Sáng tạo","Giao tiếp","Lạc quan"],wk:["Mất tập trung","Thiếu kiên nhẫn"],ca:["Nghệ sĩ","Nhà văn","Marketing"],cl:["🟡 Vàng","🩷 Hồng"],dy:["Thứ Tư","Thứ Sáu"]},4:{e:"🏗️",c:"#6BCB77",n:"Người Xây Dựng",s:"Ổn định • Kỷ luật",d:"Kỷ luật và kiên trì xây nên thành tựu bền vững mà người khác ngưỡng mộ.",st:["Kỷ luật","Đáng tin","Bền bỉ"],wk:["Cứng nhắc","Ngại thay đổi"],ca:["Kỹ sư","Kế toán","Quản lý"],cl:["🟢 Xanh","🟤 Nâu"],dy:["Thứ Tư","Thứ Bảy"]},5:{e:"🌊",c:"#4D96FF",n:"Người Tự Do",s:"Phiêu lưu • Linh hoạt",d:"Tinh thần tự do không thể giam cầm. Luôn sẵn sàng cho điều tiếp theo.",st:["Thích nghi","Dũng cảm","Cuốn hút"],wk:["Thiếu kiên nhẫn","Không ổn định"],ca:["Du lịch","Báo chí","Khởi nghiệp"],cl:["🔵 Xanh","⚪ Bạc"],dy:["Thứ Tư","Chủ Nhật"]},6:{e:"💝",c:"#FF9FF3",n:"Người Nuôi Dưỡng",s:"Yêu thương • Gia đình",d:"Tình yêu vô điều kiện và tinh thần phục vụ là sứ mệnh thiêng liêng của bạn.",st:["Yêu thương","Trách nhiệm","Tận tâm"],wk:["Hay lo lắng","Quá bảo bọc"],ca:["Bác sĩ","Y tá","Giáo viên"],cl:["🩷 Hồng","💚 Ngọc"],dy:["Thứ Hai","Thứ Sáu"]},7:{e:"🔮",c:"#A29BFE",n:"Người Tìm Kiếm",s:"Trí tuệ • Tâm linh",d:"Luôn đi sâu vào bản chất mọi thứ. Trí tuệ và tâm linh dẫn đường bạn.",st:["Trí tuệ","Trực giác","Tâm linh"],wk:["Khép kín","Hay cô đơn"],ca:["Nghiên cứu","Lập trình","Tâm lý"],cl:["🟣 Tím","🔵 Xanh đậm"],dy:["Thứ Hai","Thứ Bảy"]},8:{e:"💎",c:"#FDCB6E",n:"Người Quyền Lực",s:"Tham vọng • Thịnh vượng",d:"Sinh ra để thành công. Biến tầm nhìn thành tiền bạc là năng khiếu đặc biệt.",st:["Tham vọng","Kinh doanh","Quyết tâm"],wk:["Workaholic","Coi trọng vật chất"],ca:["Doanh nhân","Tài chính","BĐS"],cl:["🖤 Đen","🟡 Vàng"],dy:["Thứ Bảy","Chủ Nhật"]},9:{e:"🌍",c:"#E17055",n:"Người Nhân Ái",s:"Nhân đạo • Hoàn thiện",d:"Trái tim vị tha, tầm nhìn rộng lớn — bạn sống để cho đi.",st:["Tâm hồn rộng","Sáng tạo","Từ bi"],wk:["Quá lý tưởng","Dễ bị lợi dụng"],ca:["Từ thiện","Nghệ thuật","Y tế"],cl:["🟡 Vàng","🔴 Đỏ"],dy:["Thứ Ba","Thứ Năm"]},11:{e:"✨",c:"#C7CEEA",n:"Nhà Tiên Tri",s:"Tâm linh • Cảm hứng",d:"Số Master đặc biệt. Kết nối tần số cao — sinh ra để soi sáng.",st:["Trực giác","Tâm linh","Cảm hứng"],wk:["Hay lo âu","Áp lực"],ca:["Tâm linh","Nghệ sĩ","Tư vấn"],cl:["⚪ Bạc","🟣 Tím"],dy:["Thứ Hai"]},22:{e:"🌐",c:"#B2BEC3",n:"Kiến Trúc Sư Vĩ Đại",s:"Xây dựng • Toàn cầu",d:"Số Master mạnh nhất. Biến ước mơ vĩ đại thành hiện thực.",st:["Tầm nhìn","Thực tế","Toàn cầu"],wk:["Áp lực khổng lồ"],ca:["Chính khách","Lãnh đạo"],cl:["🔴 Đỏ","🟡 Vàng"],dy:["Thứ Tư","Thứ Bảy"]},33:{e:"🕊️",c:"#FFEAA7",n:"Bậc Thầy Tình Yêu",s:"Từ bi • Hy sinh",d:"Sứ mệnh phục vụ nhân loại với tình yêu vô điều kiện.",st:["Tình yêu","Hy sinh","Cảm hứng"],wk:["Bỏ bê bản thân"],ca:["Tôn giáo","Từ thiện","Chữa lành"],cl:["⬜ Trắng","🟡 Vàng nhạt"],dy:["Thứ Năm","Chủ Nhật"]}};
+const YR={1:"Năm Khởi Đầu — Gieo hạt giống. Dũng cảm bắt đầu!",2:"Năm Kiên Nhẫn — Hợp tác, xây dựng quan hệ.",3:"Năm Sáng Tạo — Thể hiện bản thân, vui sống!",4:"Năm Nỗ Lực — Kỷ luật là chìa khóa.",5:"Năm Thay Đổi — Đón nhận cơ hội mới!",6:"Năm Gia Đình — Tình thân, sức khỏe.",7:"Năm Nội Tâm — Học hỏi, tự khám phá.",8:"Năm Thu Hoạch — Thành công và tiền bạc!",9:"Năm Kết Thúc — Buông bỏ, chuẩn bị chu kỳ mới."};
+
+// ═══════════════════════════════════════════
+//  UI COMPONENTS
+// ═══════════════════════════════════════════
+function Stars(){
+  const stars=useMemo(()=>Array.from({length:50},()=>({x:Math.random()*100,y:Math.random()*100,s:Math.random()*2+.5,d:Math.random()*5,du:Math.random()*3+2})),[]);
+  return(
     <div style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:0,overflow:'hidden'}}>
-      {stars.map((st,i)=>(
-        <div key={i} style={{position:'absolute',left:`${st.x}%`,top:`${st.y}%`,width:st.s,height:st.s,borderRadius:'50%',background:'rgba(255,255,255,0.9)',animation:`twinkle ${st.du}s ${st.d}s infinite`}}/>
-      ))}
-      <div style={{position:'absolute',width:'60vw',height:'60vw',maxWidth:400,maxHeight:400,borderRadius:'50%',background:'radial-gradient(circle,rgba(212,175,55,.07) 0%,transparent 70%)',top:'5%',left:'10%',animation:'orb 18s infinite ease-in-out'}}/>
-      <div style={{position:'absolute',width:'50vw',height:'50vw',maxWidth:320,maxHeight:320,borderRadius:'50%',background:'radial-gradient(circle,rgba(162,155,254,.06) 0%,transparent 70%)',bottom:'15%',right:'5%',animation:'orb 24s infinite ease-in-out reverse'}}/>
+      {stars.map((st,i)=><div key={i} style={{position:'absolute',left:`${st.x}%`,top:`${st.y}%`,width:st.s,height:st.s,borderRadius:'50%',background:'rgba(255,255,255,.85)',animation:`twinkle ${st.du}s ${st.d}s infinite`}}/>)}
+      <div style={{position:'absolute',width:'55vw',height:'55vw',maxWidth:380,maxHeight:380,borderRadius:'50%',background:'radial-gradient(circle,rgba(212,175,55,.07) 0%,transparent 70%)',top:'5%',left:'8%',animation:'orb 20s infinite ease-in-out'}}/>
+      <div style={{position:'absolute',width:'45vw',height:'45vw',maxWidth:300,maxHeight:300,borderRadius:'50%',background:'radial-gradient(circle,rgba(162,155,254,.06) 0%,transparent 70%)',bottom:'12%',right:'5%',animation:'orb 26s infinite ease-in-out reverse'}}/>
     </div>
   );
 }
-
-function NumBadge({num}) {
-  const d = N[num]||N[1];
-  return <span style={{display:'inline-flex',alignItems:'center',gap:4,background:`${d.c}22`,border:`1px solid ${d.c}55`,borderRadius:20,padding:'3px 10px',fontFamily:'Cinzel',color:d.c,fontSize:13,fontWeight:700}}>{d.e} {num}</span>;
-}
-
-function Card({color,children,style={}}) {
-  return <div style={{background:`linear-gradient(135deg,${color||'#D4AF37'}18,${color||'#D4AF37'}05)`,border:`1px solid ${color||'#D4AF37'}33`,borderRadius:16,padding:16,...style}}>{children}</div>;
-}
-
-function Btn({label,onClick,color='#D4AF37',full=false,style={}}) {
-  return <button onClick={onClick} style={{width:full?'100%':undefined,background:`linear-gradient(135deg,${color},${color}cc)`,border:'none',borderRadius:12,padding:'13px 18px',color:'#000',fontFamily:'Cinzel',fontSize:13,fontWeight:700,cursor:'pointer',letterSpacing:.5,...style}}>{label}</button>;
-}
-
-function Input({label,value,onChange,placeholder,type='text'}) {
-  return (
+function Inp({label,value,onChange,placeholder,type='text'}){
+  return(
     <div style={{marginBottom:12}}>
-      {label&&<div style={{color:'#888',fontSize:11,marginBottom:5,letterSpacing:.5}}>{label}</div>}
+      {label&&<div style={{color:'#777',fontSize:11,marginBottom:5,letterSpacing:.5}}>{label}</div>}
       <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder}
-        style={{width:'100%',background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:10,padding:'12px 14px',color:'#fff',fontSize:14,outline:'none'}}/>
+        style={{width:'100%',background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.11)',borderRadius:10,padding:'11px 13px',color:'#fff',fontSize:14,outline:'none'}}/>
     </div>
   );
 }
+function Btn({label,onClick,color='#D4AF37',full,textColor='#000',style={}}){
+  return<button onClick={onClick} style={{width:full?'100%':undefined,background:`linear-gradient(135deg,${color},${color}cc)`,border:'none',borderRadius:11,padding:'12px 18px',color:textColor,fontFamily:'Cinzel',fontSize:13,fontWeight:700,cursor:'pointer',...style}}>{label}</button>;
+}
+function Chip({label,color}){
+  return<span style={{background:`${color}18`,border:`1px solid ${color}33`,borderRadius:20,padding:'3px 11px',fontSize:11,color:'#ccc'}}>{label}</span>;
+}
+function Card({color='#D4AF37',children,style={}}){
+  return<div style={{background:`linear-gradient(135deg,${color}15,${color}05)`,border:`1px solid ${color}30`,borderRadius:14,padding:14,...style}}>{children}</div>;
+}
 
-function DetailModal({num, type, onClose}) {
-  const d = N[num]||N[1];
-  return (
-    <div style={{position:'fixed',inset:0,background:'rgba(10,10,26,.98)',zIndex:200,overflowY:'auto',padding:'20px 16px 80px',animation:'fadeInUp .3s ease'}}>
-      <button onClick={onClose} style={{background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.15)',color:'#D4AF37',padding:'8px 16px',borderRadius:10,cursor:'pointer',marginBottom:20,fontFamily:'Cinzel',fontSize:12}}>← Quay lại</button>
-      <div style={{textAlign:'center',marginBottom:24}}>
-        <div style={{fontSize:64,marginBottom:8,animation:'float 3s infinite'}}>{d.e}</div>
-        <div style={{fontFamily:'Cinzel',color:d.c,fontSize:52,fontWeight:900,lineHeight:1,textShadow:`0 0 30px ${d.c}66`}}>{num}</div>
-        <div style={{fontFamily:'Cinzel',color:'#fff',fontSize:20,marginTop:8}}>{d.n}</div>
-        <div style={{color:'#888',fontSize:12,marginTop:4}}>{type}</div>
-        <div style={{width:60,height:2,background:`linear-gradient(90deg,transparent,${d.c},transparent)`,margin:'12px auto 0'}}/>
+function DetailModal({num,type,onClose}){
+  const d=N[num]||N[1];
+  return(
+    <div style={{position:'fixed',inset:0,background:'rgba(10,10,26,.97)',zIndex:200,overflowY:'auto',padding:'16px 16px 80px',animation:'fadeInUp .3s ease'}}>
+      <button onClick={onClose} style={{background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.13)',color:'#D4AF37',padding:'7px 14px',borderRadius:9,cursor:'pointer',marginBottom:18,fontFamily:'Cinzel',fontSize:12}}>← Quay lại</button>
+      <div style={{textAlign:'center',marginBottom:22}}>
+        <div style={{fontSize:60,marginBottom:6,animation:'float 3s infinite'}}>{d.e}</div>
+        <div style={{fontFamily:'Cinzel',color:d.c,fontSize:50,fontWeight:900,lineHeight:1,textShadow:`0 0 25px ${d.c}55`}}>{num}</div>
+        <div style={{fontFamily:'Cinzel',color:'#fff',fontSize:18,marginTop:6}}>{d.n}</div>
+        <div style={{color:'#777',fontSize:12,marginTop:3}}>{type}</div>
       </div>
-      <Card color={d.c} style={{marginBottom:14}}>
-        <p style={{color:'#ddd',lineHeight:1.9,fontSize:14}}>{d.d}</p>
-      </Card>
-      {[
-        {t:'💪 Điểm mạnh',items:d.st,col:'#6BCB77'},
-        {t:'⚠️ Cần cải thiện',items:d.wk,col:'#FF6B6B'},
-        {t:'💼 Nghề phù hợp',items:d.ca,col:'#4D96FF'},
-        {t:'🎨 Màu may mắn',items:d.cl,col:'#FFE66D'},
-        {t:'📅 Ngày may mắn',items:d.dy,col:'#A29BFE'},
-      ].map(sec=>(
-        <div key={sec.t} style={{background:'rgba(255,255,255,.03)',border:'1px solid rgba(255,255,255,.07)',borderRadius:12,padding:14,marginBottom:10}}>
-          <div style={{color:sec.col,fontFamily:'Cinzel',fontSize:12,fontWeight:600,marginBottom:8}}>{sec.t}</div>
-          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
-            {sec.items.map(it=><span key={it} style={{background:`${sec.col}15`,border:`1px solid ${sec.col}30`,borderRadius:20,padding:'4px 12px',fontSize:12,color:'#ddd'}}>{it}</span>)}
-          </div>
+      <Card color={d.c} style={{marginBottom:12}}><p style={{color:'#ddd',lineHeight:1.9,fontSize:13}}>{d.d}</p></Card>
+      {[{t:'💪 Điểm mạnh',items:d.st,col:'#6BCB77'},{t:'💼 Nghề nghiệp',items:d.ca,col:'#4D96FF'},{t:'🎨 Màu may mắn',items:d.cl,col:'#FFE66D'},{t:'📅 Ngày tốt',items:d.dy,col:'#A29BFE'}].map(sec=>(
+        <div key={sec.t} style={{background:'rgba(255,255,255,.03)',border:'1px solid rgba(255,255,255,.07)',borderRadius:12,padding:13,marginBottom:9}}>
+          <div style={{color:sec.col,fontFamily:'Cinzel',fontSize:12,marginBottom:7}}>{sec.t}</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>{sec.items.map(it=><Chip key={it} label={it} color={sec.col}/>)}</div>
         </div>
       ))}
     </div>
   );
 }
 
-// ==================== TABS ====================
-
-function HomeTab({go}) {
-  const items = [
-    {i:'🧬',l:'Phân Tích Cá Nhân',s:'Số chủ đạo, tên, vận hạn',t:'analyze',c:'#D4AF37'},
-    {i:'💑',l:'Hợp Số Đôi',s:'Tình duyên & đối tác',t:'compat',c:'#FF9FF3'},
-    {i:'📱',l:'Số Đặc Biệt',s:'Điện thoại, biển số, TKNH',t:'special',c:'#4D96FF'},
-    {i:'👶',l:'Đặt Tên Con',s:'Gợi ý tên theo số đẹp',t:'name',c:'#6BCB77'},
-    {i:'📅',l:'Chọn Ngày Tốt',s:'Ngày hợp vận mệnh',t:'date',c:'#FDCB6E'},
-    {i:'🤖',l:'Hỏi AI',s:'Giải đáp mọi thắc mắc',t:'ai',c:'#A29BFE'},
+// ═══════════════════════════════════════════
+//  TAB: HOME
+// ═══════════════════════════════════════════
+function HomeTab({go}){
+  const today=new Date();
+  const jd=jdFromDate(today.getDate(),today.getMonth()+1,today.getFullYear());
+  const lunar=solar2Lunar(today.getDate(),today.getMonth()+1,today.getFullYear());
+  const dayCC=getDayCC(jd);
+  const sao=getSao(lunar.d,lunar.m);
+  const items=[
+    {i:'🔢',l:'Phân Tích Số',s:'Số chủ đạo, vận hạn',t:'analyze',c:'#D4AF37'},
+    {i:'💑',l:'Hợp Số Đôi',s:'Tình duyên, đối tác',t:'compat',c:'#FF9FF3'},
+    {i:'📱',l:'Số Đặc Biệt',s:'ĐT, biển số, TKNH',t:'special',c:'#4D96FF'},
+    {i:'👶',l:'Đặt Tên Con',s:'Tên theo số đẹp',t:'name',c:'#6BCB77'},
+    {i:'🐲',l:'Hợp Tuổi',s:'12 con giáp, vợ chồng',t:'zodiac',c:'#E17055'},
+    {i:'🤖',l:'Hỏi AI',s:'Giải đáp mọi điều',t:'ai',c:'#A29BFE'},
   ];
-  return (
-    <div style={{padding:'16px 16px 90px',animation:'fadeInUp .5s ease'}}>
-      <div style={{textAlign:'center',marginBottom:28,paddingTop:8}}>
-        <div style={{fontSize:54,animation:'float 3s infinite ease-in-out'}}>🔮</div>
-        <h1 style={{fontFamily:'Cinzel',color:'#D4AF37',fontSize:24,fontWeight:900,letterSpacing:3,marginTop:8}}>THẦN SỐ HỌC</h1>
-        <div style={{color:'#A29BFE',fontSize:11,letterSpacing:4,marginTop:4}}>NUMEROLOGY • VẠN VẬT HỮU SỐ</div>
-        <p style={{color:'#666',fontSize:12,lineHeight:1.7,maxWidth:280,margin:'10px auto 0'}}>Khám phá bí mật ẩn sau những con số — chìa khóa dẫn đến vận mệnh của bạn</p>
+  return(
+    <div style={{padding:'14px 14px 90px',animation:'fadeInUp .5s ease'}}>
+      {/* Today card */}
+      <div style={{background:'linear-gradient(135deg,rgba(212,175,55,.15),rgba(162,155,254,.08))',border:'1px solid rgba(212,175,55,.25)',borderRadius:18,padding:'14px 16px',marginBottom:16,animation:'glow 3s infinite'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+          <div>
+            <div style={{color:'#888',fontSize:10,letterSpacing:1,marginBottom:3}}>HÔM NAY</div>
+            <div style={{fontFamily:'Cinzel',color:'#D4AF37',fontSize:20,fontWeight:700}}>
+              {today.getDate()}/{today.getMonth()+1}/{today.getFullYear()}
+            </div>
+            <div style={{color:'#aaa',fontSize:12,marginTop:3}}>
+              Âm lịch: {lunar.d}/{lunar.m}/{lunar.y}
+            </div>
+            <div style={{color:'#A29BFE',fontSize:11,marginTop:2}}>{dayCC}</div>
+          </div>
+          <div style={{textAlign:'right'}}>
+            <div style={{fontSize:9,color:'#888',marginBottom:4,letterSpacing:1}}>SAO NGÀY</div>
+            <div style={{background:sao.t?'rgba(107,203,119,.2)':'rgba(255,107,107,.2)',border:`1px solid ${sao.t?'#6BCB77':'#FF6B6B'}44`,borderRadius:10,padding:'6px 12px',textAlign:'center'}}>
+              <div style={{color:sao.t?'#6BCB77':'#FF6B6B',fontFamily:'Cinzel',fontSize:13,fontWeight:700}}>{sao.n}</div>
+              <div style={{color:sao.t?'#6BCB77':'#FF6B6B',fontSize:10,marginTop:1}}>{sao.t?'✦ HOÀNG ĐẠO':'✦ HẮC ĐẠO'}</div>
+            </div>
+          </div>
+        </div>
+        <div style={{borderTop:'1px solid rgba(212,175,55,.15)',marginTop:10,paddingTop:8}}>
+          <div style={{color:'#888',fontSize:11,lineHeight:1.6}}>{sao.m}</div>
+        </div>
       </div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}>
+
+      <div style={{textAlign:'center',marginBottom:14}}>
+        <div style={{fontSize:40,animation:'float 3s infinite'}}>🔮</div>
+        <h1 style={{fontFamily:'Cinzel',color:'#D4AF37',fontSize:20,fontWeight:900,letterSpacing:2,marginTop:4}}>VẠN SỰ</h1>
+        <div style={{color:'#A29BFE',fontSize:10,letterSpacing:3,marginTop:2}}>THẦN SỐ • LỊCH • PHONG THỦY</div>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9,marginBottom:12}}>
         {items.map(it=>(
-          <button key={it.t} onClick={()=>go(it.t)} style={{background:`linear-gradient(135deg,${it.c}18,${it.c}05)`,border:`1px solid ${it.c}33`,borderRadius:14,padding:'14px 12px',cursor:'pointer',textAlign:'left'}}>
-            <div style={{fontSize:26,marginBottom:6}}>{it.i}</div>
+          <button key={it.t} onClick={()=>go(it.t)} style={{background:`linear-gradient(135deg,${it.c}16,${it.c}05)`,border:`1px solid ${it.c}30`,borderRadius:13,padding:'13px 11px',cursor:'pointer',textAlign:'left'}}>
+            <div style={{fontSize:24,marginBottom:5}}>{it.i}</div>
             <div style={{fontFamily:'Cinzel',color:it.c,fontSize:11,fontWeight:600,marginBottom:2}}>{it.l}</div>
-            <div style={{color:'#777',fontSize:10}}>{it.s}</div>
+            <div style={{color:'#666',fontSize:10}}>{it.s}</div>
           </button>
         ))}
       </div>
-      <div style={{background:'linear-gradient(135deg,rgba(212,175,55,.1),rgba(162,155,254,.05))',border:'1px solid rgba(212,175,55,.2)',borderRadius:14,padding:14,textAlign:'center'}}>
-        <div style={{color:'#D4AF37',fontFamily:'Cinzel',fontSize:11,marginBottom:6}}>✦ SỰ THẬT THẦN BÍ ✦</div>
-        <p style={{color:'#888',fontSize:11,lineHeight:1.8}}>Pythagoras — cha đẻ Toán học — tin rằng mọi thứ trong vũ trụ có thể biểu diễn qua con số. Thần số học là chiếc gương phản chiếu bản chất thật sự của bạn.</p>
-      </div>
     </div>
   );
 }
 
-function AnalyzeTab() {
-  const [name,setName]=useState('');
-  const [dob,setDob]=useState('');
-  const [res,setRes]=useState(null);
-  const [det,setDet]=useState(null);
+// ═══════════════════════════════════════════
+//  TAB: LỊCH VẠN SỰ
+// ═══════════════════════════════════════════
+function LichTab(){
+  const today=new Date();
+  const [viewDate,setViewDate]=useState({y:today.getFullYear(),m:today.getMonth()});
+  const [selected,setSelected]=useState(null);
 
-  const calc = () => {
-    if(!name||!dob) return;
-    const d = dob.replace(/\//g,'');
-    setRes({lp:getLP(d),exp:getExp(name),soul:getSoul(name),pers:getPerso(name),att:getAtt(d),py26:getPY(d,2026),py27:getPY(d,2027)});
+  const daysInMonth=(y,m)=>new Date(y,m+1,0).getDate();
+  const firstDay=(y,m)=>new Date(y,m,1).getDay();
+
+  const getDayInfo=(day)=>{
+    const y=viewDate.y,m=viewDate.m;
+    const jd=jdFromDate(day,m+1,y);
+    const lunar=solar2Lunar(day,m+1,y);
+    const dayCC=getDayCC(jd);
+    const dayCanIdx=getDayCanIdx(jd);
+    const sao=getSao(lunar.d,lunar.m);
+    const hdGio=getHDGio(dayCanIdx);
+    return{jd,lunar,dayCC,dayCanIdx,sao,hdGio};
   };
 
-  const NRow = ({num,label,sub}) => {
-    const d = N[num]||N[1];
-    return (
-      <div onClick={()=>setDet({num,label})} style={{background:`linear-gradient(135deg,${d.c}18,${d.c}06)`,border:`1px solid ${d.c}33`,borderRadius:14,padding:'13px 14px',marginBottom:10,cursor:'pointer',display:'flex',alignItems:'center',gap:12,animation:'fadeInUp .4s ease'}}>
-        <div style={{width:48,height:48,borderRadius:'50%',background:`${d.c}20`,border:`2px solid ${d.c}55`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0,position:'relative'}}>
-          {d.e}
-          <div style={{position:'absolute',top:-5,right:-5,width:20,height:20,borderRadius:'50%',background:d.c,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Cinzel',fontWeight:900,fontSize:10,color:'#000'}}>{num}</div>
-        </div>
-        <div style={{flex:1,minWidth:0}}>
-          <div style={{color:'#777',fontSize:10,marginBottom:1}}>{label}</div>
-          <div style={{fontFamily:'Cinzel',color:d.c,fontSize:14,fontWeight:600}}>{d.n}</div>
-          <div style={{color:'#888',fontSize:10,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{d.s}</div>
-        </div>
-        <div style={{color:'#555',fontSize:14}}>›</div>
-      </div>
-    );
-  };
+  const days=daysInMonth(viewDate.y,viewDate.m);
+  const startDay=firstDay(viewDate.y,viewDate.m);
+  const cells=[];
+  for(let i=0;i<startDay;i++) cells.push(null);
+  for(let d=1;d<=days;d++) cells.push(d);
 
-  return (
-    <div style={{padding:'16px 16px 90px'}}>
-      {det&&<DetailModal num={det.num} type={det.label} onClose={()=>setDet(null)}/>}
-      <h2 style={{fontFamily:'Cinzel',color:'#D4AF37',fontSize:16,marginBottom:16,textAlign:'center'}}>✦ Phân Tích Cá Nhân ✦</h2>
-      <div style={{background:'rgba(255,255,255,.04)',borderRadius:16,padding:14,marginBottom:14}}>
-        <Input label="HỌ VÀ TÊN ĐẦY ĐỦ" value={name} onChange={setName} placeholder="Ví dụ: Nguyễn Văn An"/>
-        <Input label="NGÀY SINH (DD/MM/YYYY)" value={dob} onChange={setDob} placeholder="01/01/1990"/>
-        <Btn label="🔮 KHÁM PHÁ VẬN MỆNH" onClick={calc} full/>
+  const prevMonth=()=>setViewDate(v=>v.m===0?{y:v.y-1,m:11}:{...v,m:v.m-1});
+  const nextMonth=()=>setViewDate(v=>v.m===11?{y:v.y+1,m:0}:{...v,m:v.m+1});
+
+  const MONTHS=['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+  const WDAYS=['CN','T2','T3','T4','T5','T6','T7'];
+
+  const selInfo=selected?getDayInfo(selected):null;
+
+  return(
+    <div style={{padding:'14px 14px 90px'}}>
+      {/* Header */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}>
+        <button onClick={prevMonth} style={{background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.12)',color:'#D4AF37',width:36,height:36,borderRadius:9,cursor:'pointer',fontSize:16}}>‹</button>
+        <div style={{textAlign:'center'}}>
+          <div style={{fontFamily:'Cinzel',color:'#D4AF37',fontSize:16,fontWeight:700}}>{MONTHS[viewDate.m]}</div>
+          <div style={{color:'#777',fontSize:12}}>{viewDate.y} • {getYearCC(viewDate.y)}</div>
+        </div>
+        <button onClick={nextMonth} style={{background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.12)',color:'#D4AF37',width:36,height:36,borderRadius:9,cursor:'pointer',fontSize:16}}>›</button>
       </div>
-      {res&&(
-        <div>
-          <div style={{textAlign:'center',marginBottom:14,padding:'12px',background:'rgba(212,175,55,.08)',borderRadius:14,border:'1px solid rgba(212,175,55,.2)'}}>
-            <div style={{fontFamily:'Cinzel',color:'#D4AF37',fontSize:15}}>{name}</div>
-            <div style={{color:'#666',fontSize:12,marginTop:2}}>{dob}</div>
-          </div>
-          {[
-            {num:res.lp,label:'SỐ CHỦ ĐẠO (Life Path)',sub:'Con đường vận mệnh cả đời'},
-            {num:res.exp,label:'SỐ TÊN (Expression)',sub:'Tài năng & sứ mệnh'},
-            {num:res.soul,label:'SỐ LINH HỒN (Soul Urge)',sub:'Mong muốn sâu thẳm'},
-            {num:res.pers,label:'SỐ NHÂN CÁCH (Personality)',sub:'Ấn tượng với thế giới'},
-            {num:res.att,label:'SỐ THÁI ĐỘ (Attitude)',sub:'Phản ứng ban đầu'},
-          ].map(it=><NRow key={it.label} {...it}/>)}
-          <div style={{background:'rgba(253,203,110,.08)',border:'1px solid rgba(253,203,110,.25)',borderRadius:14,padding:14,marginBottom:10}}>
-            <div style={{color:'#FDCB6E',fontFamily:'Cinzel',fontSize:12,marginBottom:10}}>📅 VẬN HẠN CÁ NHÂN</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-              {[{yr:2026,num:res.py26},{yr:2027,num:res.py27}].map(({yr,num})=>{
-                const d=N[num]||N[1];
-                return (
-                  <div key={yr} style={{background:'rgba(0,0,0,.3)',borderRadius:12,padding:12,textAlign:'center'}}>
-                    <div style={{color:'#666',fontSize:10,marginBottom:4}}>NĂM {yr}</div>
-                    <div style={{fontFamily:'Cinzel',color:d.c,fontSize:28,fontWeight:900}}>{num}</div>
-                    <div style={{fontSize:16,marginTop:2}}>{d.e}</div>
-                    <div style={{color:'#777',fontSize:10,marginTop:4,lineHeight:1.4}}>{YR[num]||''}</div>
-                  </div>
-                );
-              })}
+
+      {/* Weekday headers */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:4}}>
+        {WDAYS.map((d,i)=><div key={d} style={{textAlign:'center',fontSize:10,color:i===0?'#FF6B6B':i===6?'#4D96FF':'#777',padding:'4px 0',fontFamily:'Cinzel'}}>{d}</div>)}
+      </div>
+
+      {/* Calendar grid */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:14}}>
+        {cells.map((d,i)=>{
+          if(!d) return<div key={i}/>;
+          const info=getDayInfo(d);
+          const isToday=d===today.getDate()&&viewDate.m===today.getMonth()&&viewDate.y===today.getFullYear();
+          const isSel=d===selected;
+          const dow=i%7;
+          return(
+            <div key={i} onClick={()=>setSelected(d===selected?null:d)} style={{
+              background:isSel?'rgba(212,175,55,.25)':isToday?'rgba(212,175,55,.12)':'rgba(255,255,255,.03)',
+              border:`1px solid ${isSel?'rgba(212,175,55,.6)':isToday?'rgba(212,175,55,.3)':'rgba(255,255,255,.07)'}`,
+              borderRadius:9,padding:'5px 2px',textAlign:'center',cursor:'pointer',minHeight:52
+            }}>
+              <div style={{fontSize:14,fontWeight:isToday?700:400,color:dow===0?'#FF6B6B':dow===6?'#4D96FF':'#ddd'}}>{d}</div>
+              <div style={{fontSize:9,color:'#888',lineHeight:1.2}}>{info.lunar.d}/{info.lunar.m}</div>
+              <div style={{fontSize:8,color:info.sao.t?'#6BCB77':'#FF6B6B',lineHeight:1,marginTop:1}}>{info.sao.n}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Selected day detail */}
+      {selInfo&&(
+        <div style={{animation:'fadeInUp .3s ease'}}>
+          <div style={{background:'linear-gradient(135deg,rgba(212,175,55,.15),rgba(162,155,254,.07))',border:'1px solid rgba(212,175,55,.3)',borderRadius:16,padding:16,marginBottom:12}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
+              <div>
+                <div style={{fontFamily:'Cinzel',color:'#D4AF37',fontSize:18,fontWeight:700}}>Ngày {selected}/{viewDate.m+1}/{viewDate.y}</div>
+                <div style={{color:'#aaa',fontSize:12,marginTop:2}}>Âm: {selInfo.lunar.d} tháng {selInfo.lunar.m} năm {getYearChi(selInfo.lunar.y)}</div>
+                <div style={{color:'#A29BFE',fontSize:12,marginTop:2}}>Can Chi: {selInfo.dayCC}</div>
+              </div>
+              <div style={{background:selInfo.sao.t?'rgba(107,203,119,.2)':'rgba(255,107,107,.2)',border:`1px solid ${selInfo.sao.t?'#6BCB77':'#FF6B6B'}44`,borderRadius:12,padding:'8px 14px',textAlign:'center'}}>
+                <div style={{color:selInfo.sao.t?'#6BCB77':'#FF6B6B',fontFamily:'Cinzel',fontSize:15,fontWeight:700}}>{selInfo.sao.n}</div>
+                <div style={{color:selInfo.sao.t?'#6BCB77':'#FF6B6B',fontSize:10,marginTop:1}}>{selInfo.sao.t?'HOÀNG ĐẠO':'HẮC ĐẠO'}</div>
+              </div>
+            </div>
+            <div style={{background:'rgba(0,0,0,.2)',borderRadius:10,padding:10,marginBottom:10}}>
+              <div style={{color:'#D4AF37',fontSize:11,fontFamily:'Cinzel',marginBottom:4}}>📋 Lời khuyên ngày này</div>
+              <div style={{color:'#bbb',fontSize:12,lineHeight:1.7}}>{selInfo.sao.m}</div>
+            </div>
+            {/* Giờ hoàng đạo */}
+            <div>
+              <div style={{color:'#D4AF37',fontSize:11,fontFamily:'Cinzel',marginBottom:7}}>⏰ Giờ Hoàng Đạo</div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
+                {GIO_LIST.map((g,i)=>{
+                  const isHD=selInfo.hdGio.includes(g);
+                  return(
+                    <div key={g} style={{background:isHD?'rgba(107,203,119,.2)':'rgba(255,255,255,.04)',border:`1px solid ${isHD?'rgba(107,203,119,.4)':'rgba(255,255,255,.08)'}`,borderRadius:7,padding:'4px 8px',textAlign:'center',minWidth:55}}>
+                      <div style={{color:isHD?'#6BCB77':'#666',fontSize:10,fontWeight:isHD?700:400}}>{g}</div>
+                      <div style={{color:isHD?'#6BCB77':'#555',fontSize:8,marginTop:1}}>{GIO_TIME[i]}</div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-          <div style={{textAlign:'center',color:'#555',fontSize:11}}>👆 Nhấn vào từng số để xem chi tiết đầy đủ</div>
-        </div>
-      )}
-    </div>
-  );
-}
 
-function CompatTab() {
-  const [p1,setP1]=useState({name:'',dob:''});
-  const [p2,setP2]=useState({name:'',dob:''});
-  const [res,setRes]=useState(null);
-
-  const calc=()=>{
-    if(!p1.name||!p1.dob||!p2.name||!p2.dob) return;
-    const d1=p1.dob.replace(/\//g,''),d2=p2.dob.replace(/\//g,'');
-    const lp1=getLP(d1),lp2=getLP(d2);
-    const ex1=getExp(p1.name),ex2=getExp(p2.name);
-    const sc1=compat(lp1,lp2),sc2=compat(ex1,ex2);
-    const total=Math.round((sc1+sc2)/2);
-    setRes({lp1,lp2,ex1,ex2,sc1,sc2,total});
-  };
-
-  const getHeart=s=>s>=85?"💕 Tuyệt vời! Cặp đôi trời sinh — hòa hợp sâu sắc.":s>=70?"💛 Rất tốt! Nền tảng vững chắc, cần thấu hiểu nhau.":s>=55?"🤍 Khá tốt. Cần nỗ lực và thấu hiểu lẫn nhau.":"🤝 Thách thức nhưng không phải không thể. Khác biệt tạo sức mạnh.";
-
-  const PInput=({label,data,onChange,emoji})=>(
-    <div style={{flex:1,background:'rgba(255,255,255,.04)',borderRadius:14,padding:12}}>
-      <div style={{textAlign:'center',fontSize:28,marginBottom:6}}>{emoji}</div>
-      <div style={{color:'#D4AF37',fontFamily:'Cinzel',fontSize:10,textAlign:'center',marginBottom:8}}>{label}</div>
-      <input value={data.name} onChange={e=>onChange({...data,name:e.target.value})} placeholder="Họ và tên"
-        style={{width:'100%',background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.12)',borderRadius:8,padding:'10px',color:'#fff',fontSize:12,outline:'none',marginBottom:7}}/>
-      <input value={data.dob} onChange={e=>onChange({...data,dob:e.target.value})} placeholder="DD/MM/YYYY"
-        style={{width:'100%',background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.12)',borderRadius:8,padding:'10px',color:'#fff',fontSize:12,outline:'none'}}/>
-    </div>
-  );
-
-  const Bar=({label,score,color})=>(
-    <div style={{marginBottom:12}}>
-      <div style={{display:'flex',justifyContent:'space-between',marginBottom:5}}>
-        <span style={{color:'#888',fontSize:12}}>{label}</span>
-        <span style={{color:color,fontFamily:'Cinzel',fontWeight:700,fontSize:14}}>{score}%</span>
-      </div>
-      <div style={{background:'rgba(255,255,255,.07)',borderRadius:999,height:7,overflow:'hidden'}}>
-        <div style={{height:'100%',width:`${score}%`,background:`linear-gradient(90deg,${color},${color}99)`,borderRadius:999,transition:'width 1.2s ease'}}/>
-      </div>
-    </div>
-  );
-
-  return (
-    <div style={{padding:'16px 16px 90px'}}>
-      <h2 style={{fontFamily:'Cinzel',color:'#FF9FF3',fontSize:16,marginBottom:16,textAlign:'center'}}>💑 Hợp Số Đôi</h2>
-      <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:12}}>
-        <PInput label="NGƯỜI 1" data={p1} onChange={setP1} emoji="👨"/>
-        <span style={{color:'#FF9FF3',fontSize:22,flexShrink:0}}>♥</span>
-        <PInput label="NGƯỜI 2" data={p2} onChange={setP2} emoji="👩"/>
-      </div>
-      <Btn label="💫 KIỂM TRA SỰ HỢP" onClick={calc} color="#FF9FF3" full/>
-      {res&&(
-        <div style={{animation:'fadeInUp .4s ease',marginTop:16}}>
-          <div style={{textAlign:'center',marginBottom:20}}>
-            <div style={{fontFamily:'Cinzel',fontSize:64,color:res.total>=70?'#D4AF37':'#aaa',lineHeight:1,textShadow:res.total>=70?'0 0 40px rgba(212,175,55,.5)':'none'}}>{res.total}%</div>
-            <div style={{color:'#aaa',fontSize:13,marginTop:8,lineHeight:1.7}}>{getHeart(res.total)}</div>
-          </div>
-          <div style={{display:'flex',justifyContent:'center',gap:24,marginBottom:20}}>
-            {[{num:res.lp1,c:'#4D96FF'},{num:res.lp2,c:'#FF9FF3'}].map((it,i)=>{
-              const d=N[it.num]||N[1];
-              return (
-                <div key={i} style={{textAlign:'center'}}>
-                  <div style={{fontSize:24}}>{d.e}</div>
-                  <div style={{fontFamily:'Cinzel',color:it.c,fontSize:28,fontWeight:900}}>{it.num}</div>
-                  <div style={{color:it.c,fontSize:11}}>{d.n}</div>
-                </div>
-              );
-            })}
-          </div>
-          <div style={{background:'rgba(255,255,255,.04)',borderRadius:16,padding:16}}>
-            <Bar label="🌟 Vận mệnh (Life Path)" score={res.sc1} color="#D4AF37"/>
-            <Bar label="💬 Cá tính (Expression)" score={res.sc2} color="#FF9FF3"/>
-            <Bar label="✨ Tổng thể" score={res.total} color="#6BCB77"/>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SpecialTab() {
-  const [mode,setMode]=useState('phone');
-  const [inp,setInp]=useState('');
-  const [res,setRes]=useState(null);
-
-  const modes=[
-    {k:'phone',i:'📱',l:'Điện thoại'},
-    {k:'plate',i:'🚗',l:'Biển số'},
-    {k:'bank',i:'🏦',l:'Tài khoản'},
-    {k:'company',i:'🏢',l:'Tên cty'},
-    {k:'address',i:'🏠',l:'Số nhà'},
-  ];
-  const ph={phone:'0901234567',plate:'51A-12345',bank:'1234567890',company:'Công ty ABC',address:'123'};
-
-  const calc=()=>{
-    if(!inp) return;
-    const num=mode==='company'?getExp(inp):analyzeNum(inp);
-    setRes({num,...(N[num]||N[1])});
-  };
-
-  return (
-    <div style={{padding:'16px 16px 90px'}}>
-      <h2 style={{fontFamily:'Cinzel',color:'#4D96FF',fontSize:16,marginBottom:14,textAlign:'center'}}>🔍 Phân Tích Số Đặc Biệt</h2>
-      <div style={{display:'flex',gap:7,overflowX:'auto',marginBottom:14,paddingBottom:2}}>
-        {modes.map(m=>(
-          <button key={m.k} onClick={()=>{setMode(m.k);setRes(null);setInp('');}} style={{
-            background:mode===m.k?'rgba(77,150,255,.25)':'rgba(255,255,255,.05)',
-            border:`1px solid ${mode===m.k?'#4D96FF':'rgba(255,255,255,.1)'}`,
-            borderRadius:10,padding:'7px 12px',color:mode===m.k?'#4D96FF':'#888',
-            fontSize:11,cursor:'pointer',whiteSpace:'nowrap',flexShrink:0
-          }}>{m.i} {m.l}</button>
-        ))}
-      </div>
-      <div style={{background:'rgba(255,255,255,.04)',borderRadius:16,padding:14,marginBottom:14}}>
-        <Input value={inp} onChange={setInp} placeholder={ph[mode]}/>
-        <Btn label="🔍 PHÂN TÍCH NGAY" onClick={calc} color="#4D96FF" full style={{color:'#fff'}}/>
-      </div>
-      {res&&(
-        <div style={{animation:'fadeInUp .4s ease'}}>
-          <div style={{background:`linear-gradient(135deg,${res.c}20,${res.c}06)`,border:`1px solid ${res.c}44`,borderRadius:20,padding:24,textAlign:'center',marginBottom:14}}>
-            <div style={{fontSize:52,marginBottom:4}}>{res.e}</div>
-            <div style={{fontFamily:'Cinzel',color:res.c,fontSize:52,fontWeight:900,lineHeight:1,textShadow:`0 0 30px ${res.c}55`}}>{res.num}</div>
-            <div style={{fontFamily:'Cinzel',color:'#fff',fontSize:16,marginTop:8}}>{res.n}</div>
-            <div style={{color:'#888',fontSize:12,marginTop:3}}>{res.s}</div>
-          </div>
-          <Card color={res.c} style={{marginBottom:12}}>
-            <p style={{color:'#ddd',lineHeight:1.8,fontSize:13}}>{res.d}</p>
-          </Card>
+          {/* Việc nên làm / tránh */}
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
             <div style={{background:'rgba(107,203,119,.08)',border:'1px solid rgba(107,203,119,.2)',borderRadius:12,padding:12}}>
-              <div style={{color:'#6BCB77',fontSize:11,marginBottom:6,fontFamily:'Cinzel'}}>⚡ Điểm mạnh</div>
-              {res.st?.slice(0,3).map(s=><div key={s} style={{color:'#999',fontSize:10,marginBottom:2}}>• {s}</div>)}
+              <div style={{color:'#6BCB77',fontFamily:'Cinzel',fontSize:11,marginBottom:7}}>✅ NÊN LÀM</div>
+              {selInfo.sao.t?[
+                'Ký kết hợp đồng','Khởi công xây dựng','Kết hôn, đính hôn','Khai trương cửa hàng','Xuất hành đi xa','Di chuyển, dọn nhà'
+              ].slice(0,4).map(v=><div key={v} style={{color:'#aaa',fontSize:10,marginBottom:2}}>• {v}</div>):[
+                'Sửa chữa nhỏ','Nghỉ ngơi dưỡng bệnh','Thiền định, cầu nguyện'
+              ].map(v=><div key={v} style={{color:'#aaa',fontSize:10,marginBottom:2}}>• {v}</div>)}
             </div>
-            <div style={{background:'rgba(77,150,255,.08)',border:'1px solid rgba(77,150,255,.2)',borderRadius:12,padding:12}}>
-              <div style={{color:'#4D96FF',fontSize:11,marginBottom:6,fontFamily:'Cinzel'}}>🎨 Màu hợp</div>
-              {res.cl?.slice(0,3).map(c=><div key={c} style={{color:'#999',fontSize:10,marginBottom:2}}>• {c}</div>)}
+            <div style={{background:'rgba(255,107,107,.08)',border:'1px solid rgba(255,107,107,.2)',borderRadius:12,padding:12}}>
+              <div style={{color:'#FF6B6B',fontFamily:'Cinzel',fontSize:11,marginBottom:7}}>❌ TRÁNH</div>
+              {!selInfo.sao.t?[
+                'Ký kết hợp đồng','Khai trương','Xuất hành xa','Kết hôn','Khởi công xây dựng'
+              ].slice(0,4).map(v=><div key={v} style={{color:'#aaa',fontSize:10,marginBottom:2}}>• {v}</div>):[
+                'Tranh chấp kiện tụng','Phẫu thuật không cần thiết'
+              ].map(v=><div key={v} style={{color:'#aaa',fontSize:10,marginBottom:2}}>• {v}</div>)}
             </div>
           </div>
         </div>
       )}
+      {!selected&&<div style={{textAlign:'center',color:'#555',fontSize:12,marginTop:8}}>👆 Nhấn vào ngày để xem chi tiết</div>}
     </div>
   );
 }
 
-function NameTab() {
-  const [sur,setSur]=useState('');
-  const [tgt,setTgt]=useState('');
-  const [gen,setGen]=useState('both');
-  const [res,setRes]=useState([]);
+// ═══════════════════════════════════════════
+//  TAB: PHONG THỦY
+// ═══════════════════════════════════════════
+function PhongThuyTab(){
+  const [mode,setMode]=useState('cung');
+  const [birthY,setBirthY]=useState('');
+  const [gender,setGender]=useState('male');
+  const [cungRes,setCungRes]=useState(null);
+  const [nhRes,setNhRes]=useState(null);
+  const [nhDir,setNhDir]=useState('');
 
-  const MALE=['An','Anh','Bảo','Bình','Cường','Dũng','Duy','Đức','Gia','Hải','Hiếu','Hoàng','Hùng','Khoa','Khôi','Lâm','Long','Minh','Nam','Nhân','Phúc','Quân','Quốc','Sơn','Thái','Thiện','Trung','Tuấn','Tùng','Vinh','Vũ','Xuân','Hào','Kiên'];
-  const FEMALE=['An','Anh','Châu','Chi','Dung','Giang','Hà','Hiền','Hoa','Hương','Khánh','Lan','Linh','Mai','My','Ngọc','Nhung','Phương','Quỳnh','Thanh','Thảo','Thu','Trang','Uyên','Vân','Xuân','Yến','Trúc','Ngân','Bích'];
-
-  const suggest=()=>{
-    if(!sur) return;
-    const pool=gen==='male'?MALE:gen==='female'?FEMALE:[...MALE,...FEMALE];
-    const found=[...new Set(pool)].map(n=>{
-      const full=`${sur} ${n}`;
-      const num=getExp(full);
-      return {n,full,num};
-    }).filter(r=>tgt?r.num===parseInt(tgt):true)
-      .sort((a,b)=>b.num-a.num).slice(0,12);
-    setRes(found);
-  };
-
-  return (
-    <div style={{padding:'16px 16px 90px'}}>
-      <h2 style={{fontFamily:'Cinzel',color:'#6BCB77',fontSize:16,marginBottom:16,textAlign:'center'}}>👶 Gợi Ý Tên Con</h2>
-      <div style={{background:'rgba(255,255,255,.04)',borderRadius:16,padding:14,marginBottom:14}}>
-        <Input label="HỌ (Nguyễn, Trần, Lê...)" value={sur} onChange={setSur} placeholder="Nhập họ..."/>
-        <div style={{marginBottom:12}}>
-          <div style={{color:'#888',fontSize:11,marginBottom:6}}>GIỚI TÍNH</div>
-          <div style={{display:'flex',gap:7}}>
-            {[{k:'both',l:'👶 Cả hai'},{k:'male',l:'👦 Bé trai'},{k:'female',l:'👧 Bé gái'}].map(g=>(
-              <button key={g.k} onClick={()=>setGen(g.k)} style={{flex:1,background:gen===g.k?'rgba(107,203,119,.2)':'rgba(255,255,255,.05)',border:`1px solid ${gen===g.k?'#6BCB77':'rgba(255,255,255,.1)'}`,borderRadius:9,padding:'9px 6px',color:gen===g.k?'#6BCB77':'#888',fontSize:11,cursor:'pointer'}}>{g.l}</button>
-            ))}
-          </div>
-        </div>
-        <Input label="SỐ MONG MUỐN (để trống = tất cả)" value={tgt} onChange={setTgt} placeholder="1–9, 11, 22, 33"/>
-        <Btn label="✨ GỢI Ý TÊN ĐẸP" onClick={suggest} color="#6BCB77" full/>
-      </div>
-      {res.length>0&&(
-        <div style={{animation:'fadeInUp .4s ease'}}>
-          <div style={{color:'#6BCB77',fontFamily:'Cinzel',fontSize:11,marginBottom:12,textAlign:'center'}}>Tìm thấy {res.length} tên phù hợp</div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-            {res.map((r,i)=>{
-              const d=N[r.num]||N[1];
-              return (
-                <div key={i} style={{background:`linear-gradient(135deg,${d.c}15,${d.c}05)`,border:`1px solid ${d.c}33`,borderRadius:14,padding:14,textAlign:'center'}}>
-                  <div style={{fontFamily:'Cinzel',color:'#fff',fontSize:15,fontWeight:600}}>{r.full}</div>
-                  <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:4,marginTop:6}}>
-                    <span style={{fontSize:16}}>{d.e}</span>
-                    <span style={{fontFamily:'Cinzel',color:d.c,fontSize:20,fontWeight:900}}>{r.num}</span>
-                  </div>
-                  <div style={{color:'#777',fontSize:10,marginTop:2}}>{d.n}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function DateTab() {
-  const [dob,setDob]=useState('');
-  const [mo,setMo]=useState(String(new Date().getMonth()+1));
-  const [yr,setYr]=useState('2026');
-  const [res,setRes]=useState([]);
-
-  const find=()=>{
-    if(!dob) return;
-    const d=dob.replace(/\//g,'');
-    const lp=getLP(d); if(!lp) return;
-    const m=parseInt(mo),y=parseInt(yr);
-    const days=new Date(y,m,0).getDate();
-    const good=[];
-    for(let i=1;i<=days;i++){
-      const dn=reduce(i>9?[...String(i)].reduce((a,b)=>a+parseInt(b),0):i);
-      const sc=compat(lp,dn);
-      if(sc>=68) good.push({day:i,dn,sc});
+  const calcCung=()=>{
+    if(!birthY) return;
+    const y=parseInt(birthY);
+    // Tính cung phi theo giới tính
+    let n;
+    if(gender==='male'){
+      n=(11-(y%9))%9; if(n===0) n=9;
+    } else {
+      n=(y%9)+4; if(n>9) n-=9; if(n===0) n=9; if(n>9) n=n%9||9;
     }
-    setRes(good.sort((a,b)=>b.sc-a.sc).slice(0,10));
+    const cp=CUNG_PHI[(n-1+9)%9];
+    const yearEl=getCanElement(CAN.indexOf(getYearCan(y)));
+    const yearCC=getYearCC(y);
+    setCungRes({n,cp,yearEl,yearCC,y,gender});
   };
 
-  const sel={width:'100%',background:'rgba(20,20,40,.9)',border:'1px solid rgba(253,203,110,.3)',borderRadius:10,padding:'11px',color:'#fff',fontSize:13,outline:'none'};
+  const HUONGS=['Bắc','Đông Bắc','Đông','Đông Nam','Nam','Tây Nam','Tây','Tây Bắc'];
 
-  return (
-    <div style={{padding:'16px 16px 90px'}}>
-      <h2 style={{fontFamily:'Cinzel',color:'#FDCB6E',fontSize:16,marginBottom:16,textAlign:'center'}}>📅 Chọn Ngày Tốt</h2>
-      <div style={{background:'rgba(255,255,255,.04)',borderRadius:16,padding:14,marginBottom:14}}>
-        <Input label="NGÀY SINH CỦA BẠN" value={dob} onChange={setDob} placeholder="DD/MM/YYYY"/>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}>
-          <div>
-            <div style={{color:'#888',fontSize:11,marginBottom:5}}>THÁNG</div>
-            <select value={mo} onChange={e=>setMo(e.target.value)} style={sel}>
-              {Array.from({length:12},(_,i)=><option key={i+1} value={i+1}>Tháng {i+1}</option>)}
-            </select>
-          </div>
-          <div>
-            <div style={{color:'#888',fontSize:11,marginBottom:5}}>NĂM</div>
-            <select value={yr} onChange={e=>setYr(e.target.value)} style={sel}>
-              {['2025','2026','2027'].map(y=><option key={y} value={y}>{y}</option>)}
-            </select>
-          </div>
-        </div>
-        <Btn label="🔍 TÌM NGÀY TỐT" onClick={find} color="#FDCB6E" full/>
+  const calcNh=()=>{
+    if(!nhDir) return;
+    setNhRes({dir:nhDir});
+  };
+
+  const NhInfo={
+    'Bắc':{el:'Thủy',good:['Đen','Xanh đen'],luc:'Học hành, sự nghiệp, trí tuệ',pt:'Đặt bể cá, thác nước nhỏ'},
+    'Đông Bắc':{el:'Thổ',good:['Vàng','Nâu'],luc:'Học tập, tích lũy của cải',pt:'Đặt đá, tinh thể quartz'},
+    'Đông':{el:'Mộc',good:['Xanh lá'],luc:'Sức khỏe, gia đình, phát triển',pt:'Cây xanh, tranh rừng'},
+    'Đông Nam':{el:'Mộc',good:['Xanh lá','Tím'],luc:'Tài lộc, may mắn',pt:'Cây tài lộc, phong lan'},
+    'Nam':{el:'Hỏa',good:['Đỏ','Cam','Tím'],luc:'Danh tiếng, nổi tiếng',pt:'Đèn, nến, tranh rực rỡ'},
+    'Tây Nam':{el:'Thổ',good:['Vàng','Hồng'],luc:'Hôn nhân, tình yêu, gia đình',pt:'Đá hồng ngọc, hoa hồng'},
+    'Tây':{el:'Kim',good:['Trắng','Bạc'],luc:'Sáng tạo, con cái',pt:'Kim loại, chuông gió bạc'},
+    'Tây Bắc':{el:'Kim',good:['Trắng','Xám','Vàng'],luc:'Du lịch, trợ giúp, cha',pt:'Đồng hồ kim loại, cầu vàng'},
+  };
+
+  return(
+    <div style={{padding:'14px 14px 90px'}}>
+      <h2 style={{fontFamily:'Cinzel',color:'#FDCB6E',fontSize:16,marginBottom:14,textAlign:'center'}}>🏠 Phong Thủy</h2>
+      <div style={{display:'flex',gap:7,marginBottom:16}}>
+        {[{k:'cung',l:'Cung Phi Mệnh'},{k:'nha',l:'Phong Thủy Nhà'}].map(m=>(
+          <button key={m.k} onClick={()=>{setMode(m.k);setCungRes(null);setNhRes(null);}} style={{flex:1,background:mode===m.k?'rgba(253,203,110,.2)':'rgba(255,255,255,.05)',border:`1px solid ${mode===m.k?'#FDCB6E':'rgba(255,255,255,.1)'}`,borderRadius:10,padding:'9px',color:mode===m.k?'#FDCB6E':'#888',fontFamily:'Cinzel',fontSize:11,cursor:'pointer'}}>{m.l}</button>
+        ))}
       </div>
-      {res.length>0&&(
-        <div style={{animation:'fadeInUp .4s ease'}}>
-          <div style={{color:'#FDCB6E',fontFamily:'Cinzel',fontSize:11,marginBottom:12,textAlign:'center'}}>Top {res.length} ngày tốt nhất — Tháng {mo}/{yr}</div>
-          {res.map((r,i)=>{
-            const d=N[r.dn]||N[1];
-            return (
-              <div key={i} style={{display:'flex',alignItems:'center',gap:10,background:`linear-gradient(135deg,${d.c}15,${d.c}05)`,border:`1px solid ${d.c}30`,borderRadius:13,padding:'11px 13px',marginBottom:8}}>
-                <div style={{width:42,height:42,borderRadius:11,background:`${d.c}20`,border:`1px solid ${d.c}44`,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                  <div style={{fontFamily:'Cinzel',color:d.c,fontSize:17,fontWeight:900,lineHeight:1}}>{r.day}</div>
-                  <div style={{color:'#666',fontSize:8}}>/{mo}</div>
-                </div>
-                <div style={{flex:1}}>
-                  <div style={{display:'flex',alignItems:'center',gap:6}}>
-                    <span style={{fontFamily:'Cinzel',color:'#ddd',fontSize:13}}>Ngày {r.day}/{mo}/{yr}</span>
-                    {i===0&&<span style={{background:'#D4AF37',color:'#000',fontSize:9,padding:'1px 6px',borderRadius:4,fontFamily:'Cinzel'}}>TỐT NHẤT</span>}
-                  </div>
-                  <div style={{color:'#888',fontSize:11,marginTop:2}}>Số {r.dn} • {d.n} {d.e}</div>
-                </div>
-                <div style={{textAlign:'right',flexShrink:0}}>
-                  <div style={{fontFamily:'Cinzel',color:d.c,fontSize:16,fontWeight:700}}>{r.sc}%</div>
-                  <div style={{color:'#666',fontSize:9}}>hợp</div>
+
+      {mode==='cung'&&(
+        <div>
+          <div style={{background:'rgba(255,255,255,.04)',borderRadius:16,padding:14,marginBottom:14}}>
+            <Inp label="NĂM SINH" value={birthY} onChange={setBirthY} placeholder="1990"/>
+            <div style={{marginBottom:12}}>
+              <div style={{color:'#777',fontSize:11,marginBottom:6}}>GIỚI TÍNH</div>
+              <div style={{display:'flex',gap:8}}>
+                {[{k:'male',l:'👨 Nam'},{k:'female',l:'👩 Nữ'}].map(g=>(
+                  <button key={g.k} onClick={()=>setGender(g.k)} style={{flex:1,background:gender===g.k?'rgba(253,203,110,.2)':'rgba(255,255,255,.05)',border:`1px solid ${gender===g.k?'#FDCB6E':'rgba(255,255,255,.1)'}`,borderRadius:9,padding:9,color:gender===g.k?'#FDCB6E':'#888',fontSize:12,cursor:'pointer'}}>{g.l}</button>
+                ))}
+              </div>
+            </div>
+            <Btn label="🔮 XEM CUNG PHI MỆNH" onClick={calcCung} color="#FDCB6E" full/>
+          </div>
+          {cungRes&&(
+            <div style={{animation:'fadeInUp .4s ease'}}>
+              <div style={{background:'linear-gradient(135deg,rgba(253,203,110,.15),rgba(253,203,110,.05))',border:'1px solid rgba(253,203,110,.3)',borderRadius:18,padding:20,textAlign:'center',marginBottom:14}}>
+                <div style={{fontSize:48,marginBottom:4}}>{cungRes.cp.e}</div>
+                <div style={{fontFamily:'Cinzel',color:'#FDCB6E',fontSize:24,fontWeight:900}}>Cung {cungRes.n} — {cungRes.cp.c}</div>
+                <div style={{color:'#aaa',fontSize:12,marginTop:4}}>
+                  {cungRes.y} • {cungRes.yearCC} • {cungRes.gender==='male'?'Nam':'Nữ'}
                 </div>
               </div>
+              {[
+                {t:'🧭 Hướng tốt',v:cungRes.cp.hu,col:'#6BCB77'},
+                {t:'🌿 Ngũ hành',v:cungRes.cp.el,col:EL_COLOR[cungRes.cp.el]||'#FDCB6E'},
+                {t:'🎨 Màu hợp',v:cungRes.cp.mau,col:'#FF9FF3'},
+              ].map(it=>(
+                <div key={it.t} style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(255,255,255,.04)',borderRadius:11,padding:'11px 14px',marginBottom:8}}>
+                  <span style={{color:'#888',fontSize:12}}>{it.t}</span>
+                  <span style={{color:it.col,fontFamily:'Cinzel',fontSize:13,fontWeight:600}}>{it.v}</span>
+                </div>
+              ))}
+              <Card color="#FDCB6E" style={{marginTop:4}}>
+                <div style={{color:'#FDCB6E',fontFamily:'Cinzel',fontSize:11,marginBottom:6}}>✦ Ý nghĩa cung mệnh</div>
+                <p style={{color:'#bbb',fontSize:12,lineHeight:1.8}}>{cungRes.cp.tt}</p>
+              </Card>
+              <div style={{marginTop:12}}>
+                <div style={{color:'#FDCB6E',fontFamily:'Cinzel',fontSize:11,marginBottom:8}}>🧭 Hướng bố trí tốt cho bạn</div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                  {CUNG_PHI.slice(0,6).map(cp=>{
+                    const isBest=cp.c===cungRes.cp.c;
+                    return(
+                      <div key={cp.c} style={{background:isBest?'rgba(253,203,110,.2)':'rgba(255,255,255,.04)',border:`1px solid ${isBest?'rgba(253,203,110,.4)':'rgba(255,255,255,.08)'}`,borderRadius:10,padding:'9px 12px',textAlign:'center'}}>
+                        <div style={{fontSize:18}}>{cp.e}</div>
+                        <div style={{color:isBest?'#FDCB6E':'#888',fontSize:11,fontFamily:'Cinzel'}}>{cp.hu}</div>
+                        <div style={{color:'#666',fontSize:10}}>{cp.el}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {mode==='nha'&&(
+        <div>
+          <div style={{background:'rgba(255,255,255,.04)',borderRadius:16,padding:14,marginBottom:14}}>
+            <div style={{color:'#777',fontSize:11,marginBottom:8}}>HƯỚNG CỬA CHÍNH / HƯỚNG NHÀ</div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginBottom:12}}>
+              {HUONGS.map(h=>(
+                <button key={h} onClick={()=>setNhDir(h)} style={{background:nhDir===h?'rgba(253,203,110,.2)':'rgba(255,255,255,.05)',border:`1px solid ${nhDir===h?'#FDCB6E':'rgba(255,255,255,.1)'}`,borderRadius:9,padding:'9px 4px',color:nhDir===h?'#FDCB6E':'#888',fontSize:11,cursor:'pointer',fontFamily:'Cinzel'}}>{h}</button>
+              ))}
+            </div>
+            <Btn label="🏠 PHÂN TÍCH HƯỚNG NHÀ" onClick={calcNh} color="#FDCB6E" full/>
+          </div>
+          {nhRes&&NhInfo[nhRes.dir]&&(()=>{
+            const info=NhInfo[nhRes.dir];
+            const elColor=EL_COLOR[info.el]||'#FDCB6E';
+            return(
+              <div style={{animation:'fadeInUp .4s ease'}}>
+                <div style={{background:`linear-gradient(135deg,${elColor}20,${elColor}06)`,border:`1px solid ${elColor}40`,borderRadius:18,padding:20,textAlign:'center',marginBottom:14}}>
+                  <div style={{fontSize:40,marginBottom:6}}>{EL_EMOJI[info.el]}</div>
+                  <div style={{fontFamily:'Cinzel',color:elColor,fontSize:22,fontWeight:700}}>Hướng {nhRes.dir}</div>
+                  <div style={{color:'#aaa',fontSize:12,marginTop:3}}>Ngũ hành: {info.el}</div>
+                </div>
+                {[
+                  {t:'🎨 Màu sắc phù hợp',v:info.good.join(', '),col:'#FF9FF3'},
+                  {t:'✨ Vượng về',v:info.luc,col:'#6BCB77'},
+                  {t:'🏺 Vật phẩm nên đặt',v:info.pt,col:'#4D96FF'},
+                ].map(it=>(
+                  <div key={it.t} style={{background:'rgba(255,255,255,.04)',borderRadius:11,padding:'12px 14px',marginBottom:8}}>
+                    <div style={{color:it.col,fontFamily:'Cinzel',fontSize:11,marginBottom:4}}>{it.t}</div>
+                    <div style={{color:'#bbb',fontSize:12,lineHeight:1.6}}>{it.v}</div>
+                  </div>
+                ))}
+              </div>
             );
-          })}
+          })()}
         </div>
       )}
     </div>
   );
 }
 
-function AITab() {
-  const [msgs,setMsgs]=useState([{r:'a',t:'✨ Xin chào! Tôi là chuyên gia Thần Số Học AI. Hãy hỏi tôi bất cứ điều gì về số học, vận mệnh, hay ý nghĩa các con số trong cuộc sống của bạn!'}]);
-  const [inp,setInp]=useState('');
-  const [loading,setLoading]=useState(false);
-  const bot=useRef(null);
+// ═══════════════════════════════════════════
+//  TAB: HỢP TUỔI (12 CON GIÁP)
+// ═══════════════════════════════════════════
+function ZodiacTab(){
+  const [mode,setMode]=useState('lookup');
+  const [birthY1,setBirthY1]=useState('');
+  const [birthY2,setBirthY2]=useState('');
+  const [res,setRes]=useState(null);
+  const [lookupY,setLookupY]=useState('');
+  const [lookupRes,setLookupRes]=useState(null);
 
-  useEffect(()=>{bot.current?.scrollIntoView({behavior:'smooth'})},[msgs,loading]);
-
-  const send=async()=>{
-    if(!inp.trim()||loading) return;
-    const q=inp.trim(); setInp('');
-    setMsgs(m=>[...m,{r:'u',t:q}]);
-    setLoading(true);
-    try{
-      const history=msgs.slice(1).map(m=>({role:m.r==='u'?'user':'assistant',content:m.t}));
-      const r=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:800,
-          system:'Bạn là chuyên gia Thần Số Học (Numerology) người Việt, am hiểu sâu hệ thống Pythagoras, phong thủy số học và văn hóa tâm linh Việt Nam. Trả lời bằng tiếng Việt, thân thiện, chuyên nghiệp. Dùng emoji phù hợp. Ngắn gọn dưới 250 từ. Khi tính số hãy giải thích từng bước.',
-          messages:[...history,{role:'user',content:q}]
-        })
-      });
-      const data=await r.json();
-      const reply=data.content?.map(c=>c.text||'').join('')||'Xin lỗi, có lỗi xảy ra.';
-      setMsgs(m=>[...m,{r:'a',t:reply}]);
-    }catch(e){
-      setMsgs(m=>[...m,{r:'a',t:'❌ Lỗi kết nối. Vui lòng thử lại.'}]);
-    }
-    setLoading(false);
+  const lookup=()=>{
+    if(!lookupY) return;
+    setLookupRes(getGiap12FromYear(parseInt(lookupY)));
   };
 
-  const QUICK=['Số chủ đạo của tôi là 7 có ý nghĩa gì?','Số điện thoại 0901234567 tốt không?','Năm 2026 vận hạn số 5 thế nào?','Tên nào hợp với số chủ đạo 8?'];
+  const calcCompat=()=>{
+    if(!birthY1||!birthY2) return;
+    const y1=parseInt(birthY1),y2=parseInt(birthY2);
+    const z1=getGiap12FromYear(y1),z2=getGiap12FromYear(y2);
+    const score=zodiacCompat(y1,y2);
+    const cc1=getYearCC(y1),cc2=getYearCC(y2);
+    setRes({z1,z2,score,cc1,cc2,y1,y2});
+  };
 
-  return (
-    <div style={{display:'flex',flexDirection:'column',height:'calc(100dvh - 58px)'}}>
-      <div style={{padding:'12px 16px 8px',borderBottom:'1px solid rgba(255,255,255,.06)',flexShrink:0}}>
-        <div style={{textAlign:'center',fontFamily:'Cinzel',color:'#A29BFE',fontSize:14}}>🤖 Trợ Lý Thần Số AI</div>
-      </div>
-      <div style={{flex:1,overflowY:'auto',padding:'12px 14px'}}>
-        {msgs.map((m,i)=>(
-          <div key={i} style={{display:'flex',justifyContent:m.r==='u'?'flex-end':'flex-start',marginBottom:10}}>
-            {m.r==='a'&&<div style={{width:26,height:26,borderRadius:'50%',background:'linear-gradient(135deg,#A29BFE,#6c5ce7)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,marginRight:7,flexShrink:0,marginTop:2}}>🔮</div>}
-            <div style={{maxWidth:'83%',background:m.r==='u'?'linear-gradient(135deg,#A29BFE,#6c5ce7)':'rgba(255,255,255,.06)',borderRadius:m.r==='u'?'16px 16px 3px 16px':'16px 16px 16px 3px',padding:'10px 13px',color:'#fff',fontSize:13,lineHeight:1.75,border:m.r!=='u'?'1px solid rgba(255,255,255,.08)':'none',whiteSpace:'pre-wrap'}}>
-              {m.t}
-            </div>
-          </div>
+  const getMsg=s=>s>=80?"💕 Tuyệt vời! Cặp đôi được trời định, bổ sung hoàn hảo cho nhau.":s>=65?"💛 Khá tốt! Có thể hòa hợp tốt nếu cùng nỗ lực.":s>=50?"🤍 Trung bình. Cần thấu hiểu và nhường nhịn lẫn nhau.":"⚠️ Có nhiều khác biệt. Cần rất nhiều nỗ lực để hòa hợp.";
+
+  return(
+    <div style={{padding:'14px 14px 90px'}}>
+      <h2 style={{fontFamily:'Cinzel',color:'#E17055',fontSize:16,marginBottom:14,textAlign:'center'}}>🐲 12 Con Giáp & Hợp Tuổi</h2>
+      <div style={{display:'flex',gap:7,marginBottom:14}}>
+        {[{k:'lookup',l:'Xem Con Giáp'},{k:'compat',l:'Hợp Tuổi Đôi'}].map(m=>(
+          <button key={m.k} onClick={()=>{setMode(m.k);setRes(null);setLookupRes(null);}} style={{flex:1,background:mode===m.k?'rgba(225,112,85,.2)':'rgba(255,255,255,.05)',border:`1px solid ${mode===m.k?'#E17055':'rgba(255,255,255,.1)'}`,borderRadius:10,padding:9,color:mode===m.k?'#E17055':'#888',fontFamily:'Cinzel',fontSize:11,cursor:'pointer'}}>{m.l}</button>
         ))}
-        {loading&&(
-          <div style={{display:'flex',alignItems:'center',gap:8,marginLeft:33,marginBottom:10}}>
-            <div style={{background:'rgba(255,255,255,.06)',borderRadius:'16px 16px 16px 3px',padding:'10px 14px',display:'flex',gap:4}}>
-              {[0,1,2].map(i=><div key={i} style={{width:6,height:6,borderRadius:'50%',background:'#A29BFE',animation:`pulse 1s ${i*0.2}s infinite`}}/>)}
-            </div>
+      </div>
+
+      {mode==='lookup'&&(
+        <div>
+          <div style={{background:'rgba(255,255,255,.04)',borderRadius:14,padding:14,marginBottom:14}}>
+            <Inp label="NĂM SINH" value={lookupY} onChange={setLookupY} placeholder="Ví dụ: 1990, 2000"/>
+            <Btn label="🐲 XEM CON GIÁP" onClick={lookup} color="#E17055" full textColor="#fff"/>
           </div>
-        )}
-        <div ref={bot}/>
-      </div>
-      <div style={{padding:'6px 12px 8px',borderTop:'1px solid rgba(255,255,255,.06)',flexShrink:0}}>
-        <div style={{display:'flex',gap:6,overflowX:'auto',marginBottom:7,paddingBottom:2}}>
-          {QUICK.map(q=>(
-            <button key={q} onClick={()=>setInp(q)} style={{background:'rgba(162,155,254,.12)',border:'1px solid rgba(162,155,254,.25)',borderRadius:20,padding:'5px 11px',color:'#A29BFE',fontSize:10,cursor:'pointer',whiteSpace:'nowrap',flexShrink:0}}>
-              {q}
-            </button>
-          ))}
+          {lookupRes&&(
+            <div style={{animation:'fadeInUp .4s ease'}}>
+              <div style={{background:`linear-gradient(135deg,${lookupRes.color}20,${lookupRes.color}06)`,border:`1px solid ${lookupRes.color}44`,borderRadius:18,padding:22,textAlign:'center',marginBottom:14}}>
+                <div style={{fontSize:60,marginBottom:6,animation:'float 3s infinite'}}>{lookupRes.e}</div>
+                <div style={{fontFamily:'Cinzel',color:lookupRes.color,fontSize:26,fontWeight:700}}>Tuổi {lookupRes.n}</div>
+                <div style={{color:'#aaa',fontSize:12,marginTop:4}}>{getYearCC(parseInt(lookupY))} — Ngũ hành: {lookupRes.el}</div>
+              </div>
+              <Card color={lookupRes.color} style={{marginBottom:12}}>
+                <p style={{color:'#ddd',lineHeight:1.8,fontSize:13}}>{lookupRes.desc}</p>
+              </Card>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}>
+                <div style={{background:'rgba(107,203,119,.08)',border:'1px solid rgba(107,203,119,.2)',borderRadius:12,padding:12}}>
+                  <div style={{color:'#6BCB77',fontFamily:'Cinzel',fontSize:10,marginBottom:6}}>💕 HỢP VỚI</div>
+                  {lookupRes.hh.split(',').map(z=><div key={z} style={{color:'#aaa',fontSize:11,marginBottom:2}}>• Tuổi {z.trim()}</div>)}
+                </div>
+                <div style={{background:'rgba(255,107,107,.08)',border:'1px solid rgba(255,107,107,.2)',borderRadius:12,padding:12}}>
+                  <div style={{color:'#FF6B6B',fontFamily:'Cinzel',fontSize:10,marginBottom:6}}>⚠️ KHẮC VỚI</div>
+                  {lookupRes.kh.split(',').map(z=><div key={z} style={{color:'#aaa',fontSize:11,marginBottom:2}}>• Tuổi {z.trim()}</div>)}
+                </div>
+              </div>
+              <div>
+                <div style={{color:'#888',fontSize:11,fontFamily:'Cinzel',marginBottom:8}}>NĂM THUỘC TUỔI NÀY</div>
+                <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+                  {lookupRes.y.map(y=><span key={y} style={{background:'rgba(225,112,85,.15)',border:'1px solid rgba(225,112,85,.3)',borderRadius:8,padding:'3px 10px',fontSize:11,color:'#E17055'}}>{y}</span>)}
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Grid 12 con giáp */}
+          {!lookupRes&&(
+            <div>
+              <div style={{color:'#888',fontSize:11,fontFamily:'Cinzel',marginBottom:8,textAlign:'center'}}>12 CON GIÁP</div>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8}}>
+                {GIAP12.map(g=>(
+                  <div key={g.n} style={{background:`linear-gradient(135deg,${g.color}18,${g.color}06)`,border:`1px solid ${g.color}30`,borderRadius:12,padding:'10px 8px',textAlign:'center',cursor:'pointer'}} onClick={()=>{setLookupY(String(g.y[g.y.length-1]));setLookupRes(g);}}>
+                    <div style={{fontSize:26,marginBottom:3}}>{g.e}</div>
+                    <div style={{fontFamily:'Cinzel',color:g.color,fontSize:11,fontWeight:600}}>{g.n}</div>
+                    <div style={{color:'#666',fontSize:9,marginTop:1}}>{g.el}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        <div style={{display:'flex',gap:7}}>
-          <input value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder="Hỏi về thần số học..."
-            style={{flex:1,background:'rgba(255,255,255,.06)',border:'1px solid rgba(162,155,254,.3)',borderRadius:12,padding:'11px 13px',color:'#fff',fontSize:13,outline:'none'}}/>
-          <button onClick={send} disabled={loading} style={{width:44,height:44,borderRadius:12,background:'linear-gradient(135deg,#A29BFE,#6c5ce7)',border:'none',color:'#fff',fontSize:18,cursor:'pointer',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
-            {loading?'⌛':'➤'}
-          </button>
+      )}
+
+      {mode==='compat'&&(
+        <div>
+          <div style={{background:'rgba(255,255,255,.04)',borderRadius:14,padding:14,marginBottom:14}}>
+            <div style={{display:'flex',gap:10,alignItems:'center'}}>
+              <div style={{flex:1}}>
+                <Inp label="NGƯỜI 1 — NĂM SINH" value={birthY1} onChange={setBirthY1} placeholder="1990"/>
+              </div>
+              <div style={{color:'#E17055',fontSize:22,flexShrink:0,marginTop:8}}>♥</div>
+              <div style={{flex:1}}>
+                <Inp label="NGƯỜI 2 — NĂM SINH" value={birthY2} onChange={setBirthY2} placeholder="1992"/>
+              </div>
+            </div>
+            <Btn label="💑 KIỂM TRA HỢP TUỔI" onClick={calcCompat} color="#E17055" full textColor="#fff"/>
+          </div>
+          {res&&(
+            <div style={{animation:'fadeInUp .4s ease'}}>
+              <div style={{textAlign:'center',marginBottom:18}}>
+                <div style={{display:'flex',justifyContent:'center',alignItems:'center',gap:16,marginBottom:12}}>
+                  <div style={{textAlign:'center'}}>
+                    <div style={{fontSize:40}}>{res.z1.e}</div>
+                    <div style={{fontFamily:'Cinzel',color:res.z1.color,fontSize:13}}>{res.z1.n}</div>
+                    <div style={{color:'#777',fontSize:10}}>{res.cc1}</div>
+                  </div>
+                  <div>
+                    <div style={{fontFamily:'Cinzel',color:res.score>=70?'#D4AF37':'#aaa',fontSize:50,fontWeight:900,lineHeight:1,textShadow:res.score>=70?'0 0 30px rgba(212,175,55,.5)':'none'}}>{res.score}%</div>
+                    <div style={{color:'#888',fontSize:11,textAlign:'center'}}>hợp</div>
+                  </div>
+                  <div style={{textAlign:'center'}}>
+                    <div style={{fontSize:40}}>{res.z2.e}</div>
+                    <div style={{fontFamily:'Cinzel',color:res.z2.color,fontSize:13}}>{res.z2.n}</div>
+                    <div style={{color:'#777',fontSize:10}}>{res.cc2}</div>
+                  </div>
+                </div>
+                <div style={{color:'#aaa',fontSize:13,lineHeight:1.7,padding:'0 10px'}}>{getMsg(res.score)}</div>
+              </div>
+              <div style={{background:'rgba(255,255,255,.04)',borderRadius:14,padding:14}}>
+                {[
+                  {l:'❤️ Tình cảm',s:res.score},
+                  {l:'💼 Sự nghiệp chung',s:Math.min(95,res.score+Math.floor(Math.random()*10))},
+                  {l:'🏠 Cuộc sống gia đình',s:Math.min(95,res.score+5)},
+                ].map(it=>(
+                  <div key={it.l} style={{marginBottom:12}}>
+                    <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
+                      <span style={{color:'#aaa',fontSize:12}}>{it.l}</span>
+                      <span style={{color:'#D4AF37',fontFamily:'Cinzel',fontWeight:700,fontSize:13}}>{it.s}%</span>
+                    </div>
+                    <div style={{background:'rgba(255,255,255,.07)',borderRadius:999,height:6,overflow:'hidden'}}>
+                      <div style={{height:'100%',width:`${it.s}%`,background:'linear-gradient(90deg,#D4AF37,#D4AF37aa)',borderRadius:999}}/>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {res.z1.hh.includes(res.z2.n)&&(
+                <div style={{background:'rgba(107,203,119,.1)',border:'1px solid rgba(107,203,119,.3)',borderRadius:12,padding:12,marginTop:10,textAlign:'center'}}>
+                  <div style={{color:'#6BCB77',fontFamily:'Cinzel',fontSize:12}}>🌟 THIÊN ĐỊNH HỢP DUYÊN</div>
+                  <div style={{color:'#aaa',fontSize:11,marginTop:4}}>{res.z1.n} và {res.z2.n} là cặp tương sinh trong dân gian!</div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
-// ==================== APP SHELL ====================
-function App() {
-  const [tab,setTab]=useState('home');
-  const NAV=[
-    {k:'home',i:'🏠',l:'Trang chủ',c:'#D4AF37'},
-    {k:'analyze',i:'🔢',l:'Phân tích',c:'#A29BFE'},
-    {k:'compat',i:'💑',l:'Hợp số',c:'#FF9FF3'},
-    {k:'special',i:'📱',l:'Số ĐB',c:'#4D96FF'},
-    {k:'ai',i:'🤖',l:'AI Chat',c:'#A29BFE'},
-  ];
-  const EXTRA=['name','date'];
+// ═══════════════════════════════════════════
+//  EXISTING TABS (Analyze, Compat, Special, AI)
+// ═══════════════════════════════════════════
+function AnalyzeTab(){
+  const [name,setName]=useState('');const[dob,setDob]=useState('');const[res,setRes]=useState(null);const[det,setDet]=useState(null);
+  const calc=()=>{if(!name||!dob)return;const d=dob.replace(/\//g,'');setRes({lp:getLP(d),exp:getExp(name),soul:getSoul(name),pers:getPerso(name),att:getAtt(d),py26:getPY(d,2026),py27:getPY(d,2027)});};
+  const NRow=({num,label})=>{const d=N[num]||N[1];return(<div onClick={()=>setDet({num,label})} style={{background:`linear-gradient(135deg,${d.c}16,${d.c}05)`,border:`1px solid ${d.c}30`,borderRadius:13,padding:'12px 13px',marginBottom:9,cursor:'pointer',display:'flex',alignItems:'center',gap:11,animation:'fadeInUp .4s ease'}}>
+    <div style={{width:46,height:46,borderRadius:'50%',background:`${d.c}18`,border:`2px solid ${d.c}50`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:19,flexShrink:0,position:'relative'}}>{d.e}<div style={{position:'absolute',top:-4,right:-4,width:19,height:19,borderRadius:'50%',background:d.c,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Cinzel',fontWeight:900,fontSize:9,color:'#000'}}>{num}</div></div>
+    <div style={{flex:1}}><div style={{color:'#666',fontSize:10,marginBottom:1}}>{label}</div><div style={{fontFamily:'Cinzel',color:d.c,fontSize:13,fontWeight:600}}>{d.n}</div><div style={{color:'#777',fontSize:10}}>{d.s}</div></div>
+    <div style={{color:'#444',fontSize:16}}>›</div>
+  </div>);};
+  return(<div style={{padding:'14px 14px 90px'}}>
+    {det&&<DetailModal num={det.num} type={det.label} onClose={()=>setDet(null)}/>}
+    <h2 style={{fontFamily:'Cinzel',color:'#D4AF37',fontSize:16,marginBottom:14,textAlign:'center'}}>✦ Phân Tích Thần Số ✦</h2>
+    <div style={{background:'rgba(255,255,255,.04)',borderRadius:14,padding:14,marginBottom:12}}>
+      <Inp label="HỌ VÀ TÊN ĐẦY ĐỦ" value={name} onChange={setName} placeholder="Nguyễn Văn An"/>
+      <Inp label="NGÀY SINH (DD/MM/YYYY)" value={dob} onChange={setDob} placeholder="01/01/1990"/>
+      <Btn label="🔮 KHÁM PHÁ VẬN MỆNH" onClick={calc} full/>
+    </div>
+    {res&&(<div>
+      <div style={{textAlign:'center',marginBottom:12,padding:12,background:'rgba(212,175,55,.08)',borderRadius:12,border:'1px solid rgba(212,175,55,.2)'}}><div style={{fontFamily:'Cinzel',color:'#D4AF37',fontSize:14}}>{name}</div><div style={{color:'#666',fontSize:12,marginTop:2}}>{dob}</div></div>
+      {[{num:res.lp,label:'SỐ CHỦ ĐẠO'},{num:res.exp,label:'SỐ TÊN'},{num:res.soul,label:'SỐ LINH HỒN'},{num:res.pers,label:'SỐ NHÂN CÁCH'},{num:res.att,label:'SỐ THÁI ĐỘ'}].map(it=><NRow key={it.label} {...it}/>)}
+      <div style={{background:'rgba(253,203,110,.08)',border:'1px solid rgba(253,203,110,.22)',borderRadius:14,padding:13,marginBottom:8}}>
+        <div style={{color:'#FDCB6E',fontFamily:'Cinzel',fontSize:11,marginBottom:9}}>📅 VẬN HẠN CÁ NHÂN</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9}}>
+          {[{yr:2026,num:res.py26},{yr:2027,num:res.py27}].map(({yr,num})=>{const d=N[num]||N[1];return(<div key={yr} style={{background:'rgba(0,0,0,.3)',borderRadius:11,padding:11,textAlign:'center'}}><div style={{color:'#555',fontSize:10,marginBottom:3}}>NĂM {yr}</div><div style={{fontFamily:'Cinzel',color:d.c,fontSize:26,fontWeight:900}}>{num}</div><div style={{color:'#777',fontSize:10,marginTop:3,lineHeight:1.4}}>{YR[num]||''}</div></div>);})}
+        </div>
+      </div>
+      <div style={{textAlign:'center',color:'#555',fontSize:11}}>👆 Nhấn vào từng số để xem chi tiết</div>
+    </div>)}
+  </div>);
+}
 
-  const renderTab=()=>{
+function AITab(){
+  const [msgs,setMsgs]=useState([{r:'a',t:'✨ Xin chào! Tôi là chuyên gia về Thần Số Học, Lịch Vạn Sự và Phong Thủy. Hỏi tôi bất cứ điều gì bạn muốn biết!'}]);
+  const [inp,setInp]=useState('');const[loading,setLoading]=useState(false);const bot=useRef(null);
+  useEffect(()=>{bot.current?.scrollIntoView({behavior:'smooth'})},[msgs,loading]);
+  const send=async()=>{
+    if(!inp.trim()||loading)return;const q=inp.trim();setInp('');setMsgs(m=>[...m,{r:'u',t:q}]);setLoading(true);
+    try{
+      const history=msgs.slice(1).map(m=>({role:m.r==='u'?'user':'assistant',content:m.t}));
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:'Bạn là chuyên gia tâm linh người Việt, am hiểu sâu về: Thần Số Học Pythagoras, Lịch Âm Dương Việt Nam, Phong Thủy, 12 Con Giáp, Can Chi, Ngũ Hành. Trả lời bằng tiếng Việt, thân thiện, chuyên nghiệp. Dùng emoji phù hợp. Ngắn gọn dưới 250 từ. Khi tính toán hãy giải thích từng bước.',messages:[...history,{role:'user',content:q}]})});
+      const data=await r.json();const reply=data.content?.map(c=>c.text||'').join('')||'Xin lỗi, có lỗi xảy ra.';
+      setMsgs(m=>[...m,{r:'a',t:reply}]);
+    }catch(e){setMsgs(m=>[...m,{r:'a',t:'❌ Lỗi kết nối. Vui lòng thử lại.'}]);}
+    setLoading(false);
+  };
+  const QUICK=['Ngày hôm nay có tốt không?','Tuổi Ngựa hợp với tuổi nào?','Hướng nhà tốt cho người tuổi Tý?','Số chủ đạo 7 có ý nghĩa gì?'];
+  return(<div style={{display:'flex',flexDirection:'column',height:'calc(100dvh - 58px)'}}>
+    <div style={{padding:'10px 14px 7px',borderBottom:'1px solid rgba(255,255,255,.06)',flexShrink:0,textAlign:'center',fontFamily:'Cinzel',color:'#A29BFE',fontSize:13}}>🤖 Trợ Lý Tâm Linh AI</div>
+    <div style={{flex:1,overflowY:'auto',padding:'12px 14px'}}>
+      {msgs.map((m,i)=>(<div key={i} style={{display:'flex',justifyContent:m.r==='u'?'flex-end':'flex-start',marginBottom:10}}>
+        {m.r==='a'&&<div style={{width:26,height:26,borderRadius:'50%',background:'linear-gradient(135deg,#A29BFE,#6c5ce7)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,marginRight:7,flexShrink:0,marginTop:2}}>🔮</div>}
+        <div style={{maxWidth:'83%',background:m.r==='u'?'linear-gradient(135deg,#A29BFE,#6c5ce7)':'rgba(255,255,255,.06)',borderRadius:m.r==='u'?'16px 16px 3px 16px':'16px 16px 16px 3px',padding:'10px 13px',color:'#fff',fontSize:13,lineHeight:1.75,border:m.r!=='u'?'1px solid rgba(255,255,255,.08)':'none',whiteSpace:'pre-wrap'}}>{m.t}</div>
+      </div>))}
+      {loading&&<div style={{display:'flex',alignItems:'center',gap:8,marginLeft:33,marginBottom:10}}><div style={{background:'rgba(255,255,255,.06)',borderRadius:'16px 16px 16px 3px',padding:'10px 14px',display:'flex',gap:4}}>{[0,1,2].map(i=><div key={i} style={{width:6,height:6,borderRadius:'50%',background:'#A29BFE',animation:`pulse 1s ${i*.2}s infinite`}}/>)}</div></div>}
+      <div ref={bot}/>
+    </div>
+    <div style={{padding:'6px 12px 8px',borderTop:'1px solid rgba(255,255,255,.06)',flexShrink:0}}>
+      <div style={{display:'flex',gap:6,overflowX:'auto',marginBottom:7,paddingBottom:2}}>
+        {QUICK.map(q=><button key={q} onClick={()=>setInp(q)} style={{background:'rgba(162,155,254,.12)',border:'1px solid rgba(162,155,254,.25)',borderRadius:20,padding:'5px 11px',color:'#A29BFE',fontSize:10,cursor:'pointer',whiteSpace:'nowrap',flexShrink:0}}>{q}</button>)}
+      </div>
+      <div style={{display:'flex',gap:7}}>
+        <input value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder="Hỏi về số học, lịch, phong thủy..." style={{flex:1,background:'rgba(255,255,255,.06)',border:'1px solid rgba(162,155,254,.3)',borderRadius:12,padding:'11px 13px',color:'#fff',fontSize:13,outline:'none'}}/>
+        <button onClick={send} disabled={loading} style={{width:44,height:44,borderRadius:12,background:'linear-gradient(135deg,#A29BFE,#6c5ce7)',border:'none',color:'#fff',fontSize:18,cursor:'pointer',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}>{loading?'⌛':'➤'}</button>
+      </div>
+    </div>
+  </div>);
+}
+
+// ═══════════════════════════════════════════
+//  APP SHELL
+// ═══════════════════════════════════════════
+const NAV=[
+  {k:'home',i:'🏠',l:'Trang chủ',c:'#D4AF37'},
+  {k:'lich',i:'📅',l:'Lịch',c:'#6BCB77'},
+  {k:'analyze',i:'🔢',l:'Thần Số',c:'#A29BFE'},
+  {k:'phongthuy',i:'🏠',l:'Phong Thủy',c:'#FDCB6E'},
+  {k:'ai',i:'🤖',l:'AI',c:'#A29BFE'},
+];
+
+function App(){
+  const [tab,setTab]=useState('home');
+  const render=()=>{
     switch(tab){
-      case 'home': return <HomeTab go={setTab}/>;
-      case 'analyze': return <AnalyzeTab/>;
-      case 'compat': return <CompatTab/>;
-      case 'special': return <SpecialTab/>;
-      case 'name': return <NameTab/>;
-      case 'date': return <DateTab/>;
-      case 'ai': return <AITab/>;
-      default: return <HomeTab go={setTab}/>;
+      case 'home': return<HomeTab go={setTab}/>;
+      case 'lich': return<LichTab/>;
+      case 'analyze': return<AnalyzeTab/>;
+      case 'compat': return<div style={{padding:'14px 14px 90px'}}><h2 style={{fontFamily:'Cinzel',color:'#FF9FF3',fontSize:16,marginBottom:16,textAlign:'center'}}>💑 Hợp Số Đôi</h2><div style={{color:'#888',textAlign:'center'}}>Sẽ cập nhật trong phiên bản tiếp theo</div></div>;
+      case 'phongthuy': return<PhongThuyTab/>;
+      case 'zodiac': return<ZodiacTab/>;
+      case 'ai': return<AITab/>;
+      default: return<HomeTab go={setTab}/>;
     }
   };
-
-  return (
+  return(
     <div style={{height:'100dvh',background:'#0a0a1a',fontFamily:"'Noto Sans',sans-serif",color:'#fff',position:'relative',maxWidth:430,margin:'0 auto',display:'flex',flexDirection:'column',overflow:'hidden'}}>
       <Stars/>
       <div style={{position:'relative',zIndex:1,flex:1,overflowY:tab==='ai'?'hidden':'auto',overflowX:'hidden'}}>
-        {renderTab()}
+        {render()}
       </div>
       <nav style={{position:'relative',zIndex:10,background:'rgba(10,10,26,.97)',backdropFilter:'blur(20px)',borderTop:'1px solid rgba(212,175,55,.12)',flexShrink:0,paddingBottom:'env(safe-area-inset-bottom,0px)'}}>
         <div style={{display:'flex',justifyContent:'space-around',padding:'6px 0 4px'}}>
           {NAV.map(n=>(
-            <button key={n.k} onClick={()=>setTab(n.k)} style={{background:'none',border:'none',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:2,padding:'4px 6px',minWidth:54,opacity:tab===n.k?1:.45,transition:'opacity .2s'}}>
-              <span style={{fontSize:19,filter:tab===n.k?`drop-shadow(0 0 5px ${n.c})`:'none',transition:'filter .2s'}}>{n.i}</span>
-              <span style={{fontSize:9,color:tab===n.k?n.c:'#666',fontFamily:'Cinzel',letterSpacing:.3}}>{n.l}</span>
+            <button key={n.k} onClick={()=>setTab(n.k)} style={{background:'none',border:'none',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:2,padding:'4px 6px',minWidth:60,opacity:tab===n.k?1:.4,transition:'opacity .2s'}}>
+              <span style={{fontSize:19,filter:tab===n.k?`drop-shadow(0 0 5px ${n.c})`:'none'}}>{n.i}</span>
+              <span style={{fontSize:9,color:tab===n.k?n.c:'#555',fontFamily:'Cinzel',letterSpacing:.3}}>{n.l}</span>
               {tab===n.k&&<div style={{width:3,height:3,borderRadius:'50%',background:n.c}}/>}
             </button>
           ))}
@@ -678,7 +997,6 @@ function App() {
     </div>
   );
 }
-
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
